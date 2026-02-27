@@ -198,6 +198,13 @@
             <div class="water-amount-container">
                 <div><span class="water-amount" id="current-water">0</span> мл</div>
                 <span class="water-total">/ 1500 мл</span>
+                <div class="input-group"><label>Назва *</label><input type="text" id="food-name-input" placeholder="Наприклад: Куряча грудка"></div>
+<div class="input-group"><label>Вага порції</label><div style="display: flex; gap: 10px;"><input type="number" id="food-weight-input" placeholder="150" style="flex-grow: 1;"><span>г</span></div></div>
+
+<button class="btn btn-primary" id="calc-btn" onclick="calculateAI()" style="width: 100%; margin-top: 10px;">Розрахувати КБЖУ</button>
+
+<div id="ai-result-card" style="display: none; margin-top: 15px; padding: 15px; background-color: var(--bg-color); border-radius: 12px; border: 1px solid var(--primary-color);">
+</div>
             </div>
             <div class="water-progress-bg"><div class="water-progress-fill" id="water-bar"></div></div>
             <div class="water-buttons">
@@ -394,3 +401,4 @@
     </script>
 </body>
 </html>
+
