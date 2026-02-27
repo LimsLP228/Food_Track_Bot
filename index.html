@@ -398,7 +398,70 @@
         function openAddMeal() { document.getElementById('dashboard').style.display = 'none'; document.getElementById('add-meal-view').style.display = 'flex'; window.scrollTo(0, 0); }
         function closeAddMeal() { document.getElementById('add-meal-view').style.display = 'none'; document.getElementById('dashboard').style.display = 'flex'; }
         function switchTab(tabId, btn) { document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active')); document.getElementById('tab-' + tabId).classList.add('active'); btn.classList.add('active'); }
+    async function calculateAI() {
+            const nameInput = document.getElementById('food-name-input').value;
+            const weightInput = document.getElementById('food-weight-input').value;
+            const btn = document.getElementById('calc-btn');
+            const resultCard = document.getElementById('ai-result-card');
+
+            if (!nameInput) {
+                tg.showAlert("Будь ласка, введіть назву страви!");
+                return;
+            }
+
+            // Формуємо запит (наприклад: "Снікерс 50г")
+            const query = weightInput ? `${nameInput} ${weightInput}г` : nameInput;
+
+            // Змінюємо кнопку, щоб користувач бачив, що йде розрахунок
+            btn.innerText = "⏳ ШІ аналізує...";
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(`${API_URL}/api/calculate_food`, {
+                    method: "POST",
+                    headers: { 
+                        "Content-Type": "application/json",
+                        "ngrok-skip-browser-warning": "true" 
+                    },
+                    body: JSON.stringify({ query: query })
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    tg.showAlert("Помилка розрахунку. Спробуйте іншу назву.");
+                } else {
+                    // Показуємо результат!
+                    resultCard.style.display = 'block';
+                    resultCard.innerHTML = `
+                        <div style="font-weight: bold; font-size: 16px; margin-bottom: 5px;">${data.name} (${data.weight}г)</div>
+                        <div style="font-size: 20px; font-weight: bold; color: var(--primary-color); margin-bottom: 10px;">${data.cals} ккал</div>
+                        <div style="display: flex; gap: 10px; font-size: 13px;">
+                            <span style="color: #8b5cf6;">Б: ${data.p}г</span>
+                            <span style="color: #f59e0b;">Ж: ${data.f}г</span>
+                            <span style="color: #3b82f6;">В: ${data.c}г</span>
+                        </div>
+                        <button class="btn btn-primary" style="width: 100%; margin-top: 15px; padding: 10px;" onclick="addMealToDashboard(${data.cals}, ${data.p}, ${data.f}, ${data.c})">✅ Додати в щоденник</button>
+                    `;
+                }
+            } catch (error) {
+                console.error(error);
+                tg.showAlert("Не вдалося підключитися до сервера.");
+            } finally {
+                // Повертаємо кнопку в нормальний стан
+                btn.innerText = "Розрахувати КБЖУ";
+                btn.disabled = false;
+            }
+        }
+
+        // Функція-заглушка для додавання в дашборд (поки просто закриває вікно)
+        function addMealToDashboard(cals, p, f, c) {
+            tg.showAlert(`Додано: ${cals} ккал!`);
+            closeAddMeal();
+            // Наступним кроком ми зробимо так, щоб ці цифри додавалися до твоїх смужок на головному екрані!
+        }
     </script>
 </body>
 </html>
+
 
