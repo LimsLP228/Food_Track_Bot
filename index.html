@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FoodApp Onboarding</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        /* Базові стилі, беремо темну тему Telegram */
+        body {
+            background-color: var(--tg-theme-bg-color, #181818);
+            color: var(--tg-theme-text-color, #ffffff);
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            box-sizing: border-box;
+        }
+
+        /* Стиль для екранів (кроків). За замовчуванням вони приховані */
+        .step {
+            display: none;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            flex-grow: 1;
+        }
+
+        /* Клас для активного (видимого) екрану */
+        .step.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Стиль кнопок */
+        .btn-primary {
+            background-color: #d82b88; /* Рожевий колір з твого дизайну */
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            width: 100%;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        /* Картки вибору статі */
+        .options-grid {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .option-card {
+            background-color: #23232b; /* Темніший фон картки */
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 20px;
+            flex: 1;
+            cursor: pointer;
+            text-align: center;
+        }
+        .option-card:active, .option-card.selected {
+            border-color: #d82b88; /* Рожева рамка при виділенні */
+        }
+    </style>
+</head>
+<body>
+
+    <div id="step1" class="step active">
+        <h2>Ласкаво просимо!</h2>
+        <div style="font-size: 50px; margin: 20px 0;">🍽</div>
+        <p>FoodApp допоможе вам відстежувати харчування та досягати цілей. Давайте налаштуємо ваш профіль!</p>
+        
+        <div style="flex-grow: 1;"></div> 
+        
+        <button class="btn-primary" onclick="nextStep(2)">Далі ></button>
+    </div>
+
+    <div id="step2" class="step">
+        <h2>Ваша стать</h2>
+        <div class="options-grid">
+            <div class="option-card" onclick="selectGender('Чоловіча', this)">
+                <div style="font-size: 30px;">👨</div>
+                <div>Чоловіча</div>
+            </div>
+            <div class="option-card" onclick="selectGender('Жіноча', this)">
+                <div style="font-size: 30px;">👩</div>
+                <div>Жіноча</div>
+            </div>
+        </div>
+
+        <div style="flex-grow: 1;"></div>
+        
+        <div style="display: flex; gap: 10px; width: 100%;">
+            <button class="btn-primary" style="background-color: #23232b;" onclick="nextStep(1)">< Назад</button>
+            <button class="btn-primary" onclick="nextStep(3)">Далі ></button>
+        </div>
+    </div>
+
+    <script>
+        // Ініціалізуємо Telegram Web App
+        const tg = window.Telegram.WebApp;
+        tg.expand(); // Розгортаємо на весь екран
+        tg.ready();
+
+        // Об'єкт для збереження даних користувача (стать, вік, вага тощо)
+        let userData = {};
+
+        // Функція для перемикання екранів
+        function nextStep(stepNumber) {
+            // Ховаємо всі кроки
+            document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+            // Показуємо потрібний
+            document.getElementById('step' + stepNumber).classList.add('active');
+        }
+
+        // Функція для вибору статі
+        function selectGender(gender, element) {
+            userData.gender = gender; // Зберігаємо вибір
+            
+            // Забираємо виділення з усіх карток
+            document.querySelectorAll('#step2 .option-card').forEach(el => el.classList.remove('selected'));
+            // Додаємо виділення (рамку) на натиснуту картку
+            element.classList.add('selected');
+        }
+    </script>
+
+</body>
+</html>
