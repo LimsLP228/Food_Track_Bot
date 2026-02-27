@@ -359,13 +359,27 @@
 
         function finishOnboarding() {
             userData.age = parseInt(document.getElementById('age').value);
-            userData.height = parseInt(document.getElementById('height').value);
-            userData.weight = parseInt(document.getElementById('weight').value);
 
-            if(!userData.gender || !userData.age || !userData.height || !userData.weight || !userData.goal || !userData.activity) {
-                tg.showAlert("Будь ласка, заповніть всі поля перед початком!");
-                return;
-            }
+            userData.telegram_id = tg.initDataUnsafe?.user?.id || 123456789;
+            
+            userData.macros = { cals: targetCals, p: targetP, f: targetF, c: targetC };
+
+            fetch("https://kirby-hypoxanthic-milagro.ngrok-free.dev -> http://localhost:8080", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(userData)
+            }).then(response => {
+                console.log("Дані успішно відправлені боту!");
+            }).catch(error => {
+                console.error("Помилка відправки:", error);
+            });
+
+            // Ховаємо онбординг, показуємо дашборд
+            document.getElementById('onboarding').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'flex';
+            document.getElementById('bottom-nav').style.display = 'flex';
+            window.scrollTo(0, 0);
+        }
 
             // Розрахунок калорій
             let bmr = (10 * userData.weight) + (6.25 * userData.height) - (5 * userData.age);
@@ -446,3 +460,4 @@
 
 </body>
 </html>
+
