@@ -359,29 +359,15 @@
 
         function finishOnboarding() {
             userData.age = parseInt(document.getElementById('age').value);
+            userData.height = parseInt(document.getElementById('height').value);
+            userData.weight = parseInt(document.getElementById('weight').value);
 
-            userData.telegram_id = tg.initDataUnsafe?.user?.id || 123456789;
-            
-            userData.macros = { cals: targetCals, p: targetP, f: targetF, c: targetC };
+            if(!userData.gender || !userData.age || !userData.height || !userData.weight || !userData.goal || !userData.activity) {
+                tg.showAlert("Будь ласка, заповніть всі поля перед початком!");
+                return;
+            }
 
-            fetch("https://kirby-hypoxanthic-milagro.ngrok-free.dev -> http://localhost:8080", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(userData)
-            }).then(response => {
-                console.log("Дані успішно відправлені боту!");
-            }).catch(error => {
-                console.error("Помилка відправки:", error);
-            });
-
-            // Ховаємо онбординг, показуємо дашборд
-            document.getElementById('onboarding').style.display = 'none';
-            document.getElementById('dashboard').style.display = 'flex';
-            document.getElementById('bottom-nav').style.display = 'flex';
-            window.scrollTo(0, 0);
-        }
-
-            // Розрахунок калорій
+            // 1. Спочатку розраховуємо калорії та БЖУ
             let bmr = (10 * userData.weight) + (6.25 * userData.height) - (5 * userData.age);
             bmr += (userData.gender === 'male') ? 5 : -161;
             let actMultiplier = { 'low': 1.2, 'medium': 1.55, 'high': 1.725 }[userData.activity];
@@ -394,12 +380,28 @@
             let targetF = Math.round((targetCals * 0.3) / 9);
             let targetC = Math.round((targetCals * 0.4) / 4);
 
+            // Оновлюємо цифри на екрані
             document.getElementById('cal-target').innerText = targetCals;
             document.getElementById('p-text').innerText = `0/${targetP} г`;
             document.getElementById('f-text').innerText = `0/${targetF} г`;
             document.getElementById('c-text').innerText = `0/${targetC} г`;
 
-            // Ховаємо онбординг, показуємо дашборд
+            // 2. Формуємо дані для відправки боту
+            userData.telegram_id = tg.initDataUnsafe?.user?.id || 123456789;
+            userData.macros = { cals: targetCals, p: targetP, f: targetF, c: targetC };
+
+            // 3. Відправляємо дані боту (ВИПРАВЛЕНЕ ПОСИЛАННЯ)
+            fetch("https://kirby-hypoxanthic-milagro.ngrok-free.dev/api/save_user", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(userData)
+            }).then(response => {
+                console.log("Дані успішно відправлені боту!");
+            }).catch(error => {
+                console.error("Помилка відправки:", error);
+            });
+
+            // 4. Ховаємо онбординг, показуємо дашборд
             document.getElementById('onboarding').style.display = 'none';
             document.getElementById('dashboard').style.display = 'flex';
             document.getElementById('bottom-nav').style.display = 'flex';
@@ -408,19 +410,17 @@
 
         // --- ЛОГІКА ДАШБОРДУ ---
         
-        // 1. Вода
+        // Вода
         let currentWater = 0;
         const maxWater = 1500;
         function addWater(amount) {
             currentWater += amount;
             document.getElementById('current-water').innerText = currentWater;
-            
-            // Заповнення смужки у відсотках (максимум 100%)
             let percentage = Math.min((currentWater / maxWater) * 100, 100);
             document.getElementById('water-bar').style.width = percentage + '%';
         }
 
-        // 2. Згортання AI підказок
+        // Згортання AI підказок
         function toggleAI() {
             const content = document.getElementById('ai-content');
             const arrow = document.getElementById('ai-arrow');
@@ -433,7 +433,7 @@
             }
         }
 
-        // 3. Відкриття/Закриття екрану "Додати страву"
+        // Відкриття/Закриття екрану "Додати страву"
         function openAddMeal() {
             document.getElementById('dashboard').style.display = 'none';
             document.getElementById('add-meal-view').style.display = 'flex';
@@ -445,14 +445,10 @@
             document.getElementById('dashboard').style.display = 'flex';
         }
 
-        // 4. Перемикання табів всередині екрану "Додати страву"
+        // Перемикання табів
         function switchTab(tabId, btnElement) {
-            // Ховаємо весь контент табів
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            // Забираємо виділення з усіх кнопок
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            
-            // Показуємо потрібний контент і виділяємо кнопку
             document.getElementById('tab-' + tabId).classList.add('active');
             btnElement.classList.add('active');
         }
@@ -460,4 +456,3 @@
 
 </body>
 </html>
-
