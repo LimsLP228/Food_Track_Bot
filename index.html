@@ -23,7 +23,7 @@
             margin: 0; padding: 0; box-sizing: border-box; overflow-x: hidden; overflow-y: auto;
         }
 
-        /* --- СТИЛІ ОНБОРДИНГУ (ЗГОРНУТО ДЛЯ КОМПАКТНОСТІ) --- */
+        /* --- СТИЛІ ОНБОРДИНГУ --- */
         .onboarding-container { padding: 20px; display: flex; flex-direction: column; min-height: 100vh; }
         .step { display: none; width: 100%; max-width: 400px; flex-grow: 1; flex-direction: column; margin: 0 auto; }
         .step.active { display: flex; }
@@ -66,7 +66,6 @@
         .water-amount-container { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 5px; }
         .water-amount { font-size: 24px; font-weight: bold; }
         .water-total { font-size: 16px; color: var(--text-muted); font-weight: normal; }
-        /* Нова смужка води */
         .water-progress-bg { width: 100%; height: 4px; background-color: var(--water-bg); border-radius: 2px; margin-bottom: 15px; overflow: hidden; }
         .water-progress-fill { height: 100%; background-color: var(--water-fill); width: 0%; transition: width 0.3s ease; }
         .water-buttons { display: flex; gap: 10px; justify-content: space-between; }
@@ -75,7 +74,7 @@
 
         /* AI-ПІДКАЗКИ */
         .ai-header { display: flex; align-items: center; justify-content: space-between; font-weight: bold; font-size: 16px; color: #c084fc; cursor: pointer; }
-        .ai-content { display: block; margin-top: 15px; /* За замовчуванням відкрито */ }
+        .ai-content { display: block; margin-top: 15px; }
         .ai-text { font-size: 14px; color: var(--text-muted); margin-bottom: 15px; line-height: 1.4; }
         .food-card { background-color: var(--bg-color); border-radius: 12px; padding: 15px; margin-bottom: 10px; }
         .food-header { display: flex; justify-content: space-between; margin-bottom: 5px; }
@@ -95,29 +94,19 @@
         /* --- ЕКРАН "ДОДАТИ СТРАВУ" --- */
         .view-header { display: flex; align-items: center; margin-bottom: 20px; font-size: 18px; font-weight: bold; gap: 15px; }
         .back-btn { background: none; border: none; color: white; font-size: 20px; cursor: pointer; padding: 0; }
-        
-        /* Таби (Фото, Ввід, Часті, Усі) */
         .tabs-container { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
         .tab-btn { background-color: var(--bg-color); color: var(--text-muted); border: none; padding: 10px 15px; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; white-space: nowrap; }
         .tab-btn.active { background-color: var(--card-bg); color: white; border: 1px solid var(--border-color); }
-        
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-
-        /* Саб-таби для "Ввід" */
         .sub-tabs { display: flex; background-color: var(--bg-color); border-radius: 10px; padding: 4px; margin-bottom: 20px; }
         .sub-tab-btn { flex: 1; background: none; border: none; color: var(--text-muted); padding: 8px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; }
         .sub-tab-btn.active { background-color: var(--card-bg); color: white; }
-
-        /* Вміст табів */
         .photo-area { border: 2px dashed var(--border-color); border-radius: 16px; height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; background-color: rgba(26, 26, 36, 0.3); }
         .photo-buttons { display: flex; gap: 15px; }
         .photo-btn { background-color: var(--card-bg); border: 1px solid var(--border-color); color: white; padding: 10px 20px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 5px; }
-        
         .empty-state { text-align: center; color: var(--text-muted); font-size: 14px; margin-top: 40px; }
         .empty-icon { font-size: 40px; margin-bottom: 10px; opacity: 0.5; }
-
-        /* Плаваюча кнопка робота */
         .fab-bot { position: fixed; bottom: 80px; right: 20px; background-color: var(--primary-color); width: 56px; height: 56px; border-radius: 28px; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 12px rgba(213, 40, 133, 0.4); cursor: pointer; z-index: 90; }
 
         /* Нижнє меню */
@@ -129,7 +118,7 @@
 </head>
 <body>
 
-    <div id="onboarding" class="onboarding-container">
+    <div id="onboarding" class="onboarding-container" style="display: none;">
         <div id="step1" class="step active">
             <div class="step-content">
                 <div class="welcome-icon">🍽</div>
@@ -138,7 +127,6 @@
             </div>
             <div class="nav-buttons"><button class="btn btn-primary" onclick="nextStep(2)">Далі ></button></div>
         </div>
-
         <div id="step2" class="step">
             <div class="step-content">
                 <div class="card-container">
@@ -151,7 +139,6 @@
             </div>
             <div class="nav-buttons"><button class="btn btn-secondary" onclick="nextStep(1)">< Назад</button><button class="btn btn-primary" onclick="nextStep(3)">Далі ></button></div>
         </div>
-
         <div id="step3" class="step">
             <div class="step-content">
                 <div class="card-container">
@@ -163,7 +150,6 @@
             </div>
             <div class="nav-buttons"><button class="btn btn-secondary" onclick="nextStep(2)">< Назад</button><button class="btn btn-primary" onclick="nextStep(4)">Далі ></button></div>
         </div>
-
         <div id="step4" class="step">
             <div class="step-content">
                 <div class="card-container">
@@ -177,7 +163,6 @@
             </div>
             <div class="nav-buttons"><button class="btn btn-secondary" onclick="nextStep(3)">< Назад</button><button class="btn btn-primary" onclick="nextStep(5)">Далі ></button></div>
         </div>
-
         <div id="step5" class="step">
             <div class="step-content">
                 <div class="card-container">
@@ -195,7 +180,7 @@
 
 
     <div id="dashboard" class="main-view">
-        <div class="header-date"><span class="arrow">‹</span><span>27 лютого</span><span class="arrow">›</span></div>
+        <div class="header-date"><span class="arrow">‹</span><span>Сьогодні</span><span class="arrow">›</span></div>
 
         <div class="dash-card">
             <div class="macros-wrapper">
@@ -229,21 +214,7 @@
                 <span id="ai-arrow">^</span>
             </div>
             <div id="ai-content" class="ai-content">
-                <div class="ai-text">Ви починаєте день без спожитих нутрієнтів, тому рекомендується збалансований обід з акцентом на білок для підтримки рекомпозиції.</div>
-                
-                <div class="food-card">
-                    <div class="food-header"><span class="food-title">Куряче філе, запечене</span> <span class="food-weight">150г</span></div>
-                    <div class="food-macros">165 ккал &nbsp; <span class="m-p">Б:31г</span> &nbsp; <span class="m-f">Ж:3.6г</span> &nbsp; <span class="m-c">В:0г</span></div>
-                    <div class="food-desc">Високобілковий продукт з низьким вмістом жирів, ідеальний для нарощування м'язів.</div>
-                </div>
-                
-                <div class="food-card">
-                    <div class="food-header"><span class="food-title">Кіноа варена</span> <span class="food-weight">150г</span></div>
-                    <div class="food-macros">222 ккал &nbsp; <span class="m-p">Б:8г</span> &nbsp; <span class="m-f">Ж:3.5г</span> &nbsp; <span class="m-c">В:39г</span></div>
-                    <div class="food-desc">Джерело складних вуглеводів і додаткового білка, допоможе насититися надовго.</div>
-                </div>
-
-                <div class="ai-footer-tip"><div>💡</div><div>Для рекомпозиції важливо розподіляти білок рівномірно протягом дня, не забувайте про достатню гідратацію.</div></div>
+                <div class="ai-text">Ви починаєте день без спожитих нутрієнтів, тому рекомендується збалансований обід з акцентом на білок.</div>
                 <button class="btn-refresh">Оновити рекомендації</button>
             </div>
         </div>
@@ -263,7 +234,6 @@
             <button class="back-btn" onclick="closeAddMeal()">←</button>
             <span>Додати страву</span>
         </div>
-
         <div class="tabs-container">
             <button class="tab-btn" onclick="switchTab('photo', this)">📷 Фото</button>
             <button class="tab-btn active" onclick="switchTab('input', this)">✎ Ввід</button>
@@ -287,47 +257,17 @@
                 <button class="sub-tab-btn">Рецепт</button>
                 <button class="sub-tab-btn">Ручний</button>
             </div>
-            
             <div class="dash-card">
                 <h3 style="margin-top:0; font-size: 16px;">AI розрахунок</h3>
-                <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px;">Введіть назву продукту або страви, AI розрахує КБЖУ</p>
-                
-                <div class="input-group">
-                    <label>Назва *</label>
-                    <input type="text" placeholder="Наприклад: Куряча грудка">
-                </div>
-                
-                <div class="input-group">
-                    <label>Вага порції (необов'язково)</label>
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <input type="number" placeholder="150" style="flex-grow: 1;">
-                        <span>г</span>
-                    </div>
-                </div>
-                
+                <div class="input-group"><label>Назва *</label><input type="text" placeholder="Наприклад: Куряча грудка"></div>
+                <div class="input-group"><label>Вага порції</label><div style="display: flex; gap: 10px;"><input type="number" placeholder="150" style="flex-grow: 1;"><span>г</span></div></div>
                 <button class="btn btn-primary" style="width: 100%; margin-top: 10px;">Розрахувати КБЖУ</button>
             </div>
         </div>
 
-        <div id="tab-frequent" class="tab-content">
-            <div class="dash-card" style="display: flex; flex-direction: column; align-items: center; padding: 40px 20px;">
-                <div class="empty-icon">⚡</div>
-                <h3 style="margin: 10px 0;">Поки немає частих страв</h3>
-                <p style="color: var(--text-muted); font-size: 13px; text-align: center; margin-bottom: 20px;">Тут з'являться страви, які ви додаєте найчастіше (від 2 разів)</p>
-                <button class="photo-btn">📷 Додати першу страву</button>
-            </div>
-        </div>
-
-        <div id="tab-all" class="tab-content">
-            <div class="input-group">
-                <input type="text" placeholder="Пошук..." style="background-color: transparent; border: 1px solid var(--border-color);">
-            </div>
-            <div class="empty-state">
-                Історія порожня<br>Додайте першу страву
-            </div>
-        </div>
+        <div id="tab-frequent" class="tab-content"><div class="dash-card" style="text-align: center;"><h3 style="margin: 10px 0;">Поки немає частих страв</h3></div></div>
+        <div id="tab-all" class="tab-content"><div class="empty-state">Історія порожня</div></div>
     </div>
-
 
     <nav class="bottom-nav" id="bottom-nav" style="display: none;">
         <div class="nav-item active" onclick="closeAddMeal()"><div class="nav-icon">🏠</div>Сьогодні</div>
@@ -344,44 +284,39 @@
 
         let userData = { gender: null, age: null, height: null, weight: null, goal: null, activity: null };
         
-        // ВАЖЛИВО: Встав сюди своє поточне посилання з Ngrok!
+        // 🔴🔴🔴 УВАГА: ВСТАВ СЮДИ СВІЙ АКТУАЛЬНИЙ NGROK URL 🔴🔴🔴
         const API_URL = "https://kirby-hypoxanthic-milagro.ngrok-free.dev"; 
 
-        // Одразу ховаємо онбординг, поки чекаємо відповідь від сервера
-        document.getElementById('onboarding').style.display = 'none';
-
-        // Функція, яка запускається при відкритті додатка
         async function checkUserOnLoad() {
             const tg_id = tg.initDataUnsafe?.user?.id || 123456789;
 
             try {
-                // Запитуємо у нашого Python-бота: чи є такий юзер?
-                const response = await fetch(`${API_URL}/api/get_user?telegram_id=${tg_id}`);
+                // Відправляємо GET запит і спеціальний заголовок, щоб Ngrok нас пропустив
+                const response = await fetch(`${API_URL}/api/get_user?telegram_id=${tg_id}`, {
+                    method: "GET",
+                    headers: { "ngrok-skip-browser-warning": "true" }
+                });
+                
                 const data = await response.json();
 
                 if (data.exists) {
-                    // Користувач Є В БАЗІ! 
-                    // 1. Підставляємо його збережені макроси на головний екран
                     document.getElementById('cal-target').innerText = data.target_calories;
                     document.getElementById('p-text').innerText = `0/${data.target_p} г`;
                     document.getElementById('f-text').innerText = `0/${data.target_f} г`;
                     document.getElementById('c-text').innerText = `0/${data.target_c} г`;
 
-                    // 2. Відкриваємо дашборд (минаємо онбординг)
                     document.getElementById('dashboard').style.display = 'flex';
                     document.getElementById('bottom-nav').style.display = 'flex';
                 } else {
-                    // Користувача НЕМАЄ. Показуємо вікно реєстрації.
                     document.getElementById('onboarding').style.display = 'flex';
                 }
             } catch (error) {
-                console.error("Помилка підключення до сервера:", error);
-                // Якщо сервер вимкнений (або ngrok відпав), показуємо реєстрацію для підстраховки
+                console.error("Помилка:", error);
                 document.getElementById('onboarding').style.display = 'flex';
             }
         }
 
-        // Запускаємо перевірку одразу при старті
+        // Запуск при старті
         checkUserOnLoad();
 
         // --- ЛОГІКА ОНБОРДИНГУ ---
@@ -403,11 +338,9 @@
             userData.weight = parseInt(document.getElementById('weight').value);
 
             if(!userData.gender || !userData.age || !userData.height || !userData.weight || !userData.goal || !userData.activity) {
-                tg.showAlert("Будь ласка, заповніть всі поля перед початком!");
-                return;
+                tg.showAlert("Заповніть всі поля!"); return;
             }
 
-            // 1. Спочатку розраховуємо калорії та БЖУ
             let bmr = (10 * userData.weight) + (6.25 * userData.height) - (5 * userData.age);
             bmr += (userData.gender === 'male') ? 5 : -161;
             let actMultiplier = { 'low': 1.2, 'medium': 1.55, 'high': 1.725 }[userData.activity];
@@ -420,28 +353,24 @@
             let targetF = Math.round((targetCals * 0.3) / 9);
             let targetC = Math.round((targetCals * 0.4) / 4);
 
-            // Оновлюємо цифри на екрані
             document.getElementById('cal-target').innerText = targetCals;
             document.getElementById('p-text').innerText = `0/${targetP} г`;
             document.getElementById('f-text').innerText = `0/${targetF} г`;
             document.getElementById('c-text').innerText = `0/${targetC} г`;
 
-            // 2. Формуємо дані для відправки боту
             userData.telegram_id = tg.initDataUnsafe?.user?.id || 123456789;
             userData.macros = { cals: targetCals, p: targetP, f: targetF, c: targetC };
 
-            // 3. Відправляємо дані боту (ВИПРАВЛЕНЕ ПОСИЛАННЯ)
-            fetch("https://kirby-hypoxanthic-milagro.ngrok-free.dev/api/save_user", {
+            // Відправляємо POST запит
+            fetch(`${API_URL}/api/save_user`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { 
+                    "Content-Type": "application/json",
+                    "ngrok-skip-browser-warning": "true" 
+                },
                 body: JSON.stringify(userData)
-            }).then(response => {
-                console.log("Дані успішно відправлені боту!");
-            }).catch(error => {
-                console.error("Помилка відправки:", error);
             });
 
-            // 4. Ховаємо онбординг, показуємо дашборд
             document.getElementById('onboarding').style.display = 'none';
             document.getElementById('dashboard').style.display = 'flex';
             document.getElementById('bottom-nav').style.display = 'flex';
@@ -449,52 +378,19 @@
         }
 
         // --- ЛОГІКА ДАШБОРДУ ---
-        
-        // Вода
-        let currentWater = 0;
-        const maxWater = 1500;
+        let currentWater = 0; const maxWater = 1500;
         function addWater(amount) {
-            currentWater += amount;
-            document.getElementById('current-water').innerText = currentWater;
-            let percentage = Math.min((currentWater / maxWater) * 100, 100);
-            document.getElementById('water-bar').style.width = percentage + '%';
+            currentWater += amount; document.getElementById('current-water').innerText = currentWater;
+            document.getElementById('water-bar').style.width = Math.min((currentWater / maxWater) * 100, 100) + '%';
         }
-
-        // Згортання AI підказок
         function toggleAI() {
-            const content = document.getElementById('ai-content');
-            const arrow = document.getElementById('ai-arrow');
-            if(content.style.display === 'none') {
-                content.style.display = 'block';
-                arrow.innerText = '^';
-            } else {
-                content.style.display = 'none';
-                arrow.innerText = 'v';
-            }
+            const content = document.getElementById('ai-content'); const arrow = document.getElementById('ai-arrow');
+            if(content.style.display === 'none') { content.style.display = 'block'; arrow.innerText = '^'; } 
+            else { content.style.display = 'none'; arrow.innerText = 'v'; }
         }
-
-        // Відкриття/Закриття екрану "Додати страву"
-        function openAddMeal() {
-            document.getElementById('dashboard').style.display = 'none';
-            document.getElementById('add-meal-view').style.display = 'flex';
-            window.scrollTo(0, 0);
-        }
-
-        function closeAddMeal() {
-            document.getElementById('add-meal-view').style.display = 'none';
-            document.getElementById('dashboard').style.display = 'flex';
-        }
-
-        // Перемикання табів
-        function switchTab(tabId, btnElement) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById('tab-' + tabId).classList.add('active');
-            btnElement.classList.add('active');
-        }
+        function openAddMeal() { document.getElementById('dashboard').style.display = 'none'; document.getElementById('add-meal-view').style.display = 'flex'; window.scrollTo(0, 0); }
+        function closeAddMeal() { document.getElementById('add-meal-view').style.display = 'none'; document.getElementById('dashboard').style.display = 'flex'; }
+        function switchTab(tabId, btn) { document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active')); document.getElementById('tab-' + tabId).classList.add('active'); btn.classList.add('active'); }
     </script>
-
 </body>
 </html>
-
-
