@@ -6,131 +6,83 @@
     <title>FoodApp</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root {
-            --bg-color: #0d0d12;
-            --card-bg: #1a1a24;
-            --primary-color: #d52885;
-            --text-color: #ffffff;
-            --text-muted: #8e8e93;
-            --border-color: #2c2c35;
-            --water-bg: #1e293b;
-            --water-fill: #3b82f6;
-            --purple-macros: #8b5cf6;
-            --orange-macros: #f59e0b;
-            --blue-macros: #3b82f6;
-        }
-
-        body {
-            background-color: var(--bg-color); color: var(--text-color);
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            margin: 0; padding: 0; box-sizing: border-box; overflow-x: hidden;
-        }
-
-        /* Утиліти */
+        :root { --bg-color: #0d0d12; --card-bg: #1a1a24; --primary-color: #d52885; --text-color: #ffffff; --text-muted: #8e8e93; --border-color: #2c2c35; --water-bg: #1e293b; --water-fill: #3b82f6; --purple-macros: #8b5cf6; --orange-macros: #f59e0b; --blue-macros: #3b82f6; }
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; box-sizing: border-box; overflow-x: hidden; }
         .onboarding-container { padding: 20px; display: flex; flex-direction: column; min-height: 100vh; }
-        .step { display: none; width: 100%; max-width: 400px; flex-grow: 1; flex-direction: column; margin: 0 auto; }
-        .step.active { display: flex; }
+        .step { display: none; width: 100%; max-width: 400px; flex-grow: 1; flex-direction: column; margin: 0 auto; } .step.active { display: flex; }
         .step-content { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; }
-        h2 { text-align: center; margin-bottom: 20px; font-size: 22px; }
-        p.subtitle { text-align: center; color: var(--text-muted); font-size: 14px; margin-bottom: 30px; }
-        
+        h2 { text-align: center; margin-bottom: 20px; font-size: 22px; } p.subtitle { text-align: center; color: var(--text-muted); font-size: 14px; margin-bottom: 30px; }
         .card-container, .dash-card { background-color: var(--card-bg); border-radius: 16px; padding: 20px; border: 1px solid var(--border-color); margin-bottom: 15px; }
-        
-        .input-group { margin-bottom: 15px; } 
-        .input-group label { display: block; font-weight: bold; margin-bottom: 8px; font-size: 14px; }
+        .input-group { margin-bottom: 15px; } .input-group label { display: block; font-weight: bold; margin-bottom: 8px; font-size: 14px; }
         .input-group input { width: 100%; background-color: var(--bg-color); border: 1px solid var(--border-color); color: white; padding: 12px; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
         .input-group input:focus { outline: none; border-color: var(--primary-color); }
-
         .nav-buttons { display: flex; gap: 10px; margin-top: 20px; padding-bottom: 20px; }
         .btn { padding: 16px; border-radius: 12px; font-size: 16px; font-weight: bold; border: none; cursor: pointer; text-align: center; transition: 0.1s; }
-        .btn-primary { background-color: var(--primary-color); color: white; flex: 2; }
-        .btn-primary:active { background-color: #a82069; }
-        .btn-secondary { background-color: var(--card-bg); color: white; border: 1px solid var(--border-color); flex: 1; }
-
+        .btn-primary { background-color: var(--primary-color); color: white; flex: 2; } .btn-secondary { background-color: var(--card-bg); color: white; border: 1px solid var(--border-color); flex: 1; }
         .welcome-icon { font-size: 60px; text-align: center; margin-bottom: 10px; }
-
-        /* --- ГЛАВНА ПАНЕЛЬ --- */
+        
         .main-view { display: none; flex-direction: column; padding: 15px; padding-bottom: 100px; max-width: 500px; margin: 0 auto; box-sizing: border-box; }
         .header-date { display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 18px; margin-bottom: 20px; padding: 0 10px; }
         .arrow { color: var(--text-muted); cursor: pointer; font-size: 20px; padding: 0 5px; }
-
         .macros-wrapper { display: flex; align-items: center; gap: 20px; }
         .circle-progress { width: 90px; height: 90px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; transition: background 0.3s ease; }
         .circle-inner { width: 76px; height: 76px; background-color: var(--card-bg); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .circle-val { font-size: 20px; font-weight: bold; } .circle-total { font-size: 11px; color: var(--text-muted); }
         .bars-container { flex-grow: 1; display: flex; flex-direction: column; gap: 12px; }
+        .bar-row { display: flex; flex-direction: column; gap: 5px; }
         .bar-labels { display: flex; justify-content: space-between; font-size: 13px; color: var(--text-muted); margin-bottom: 4px; }
         .bar-bg { width: 100%; height: 6px; background-color: var(--border-color); border-radius: 3px; overflow: hidden; }
         .bar-fill { height: 100%; border-radius: 3px; width: 0%; transition: width 0.3s ease; }
-
-        /* Вода */
+        
+        .water-header { display: flex; align-items: center; gap: 8px; color: var(--water-fill); font-weight: bold; margin-bottom: 10px; }
         .water-progress-bg { width: 100%; height: 4px; background-color: var(--water-bg); border-radius: 2px; margin-bottom: 15px; overflow: hidden; }
         .water-progress-fill { height: 100%; background-color: var(--water-fill); width: 0%; transition: width 0.3s ease; }
         .water-btn { background-color: var(--bg-color); border: 1px solid var(--border-color); color: white; border-radius: 20px; padding: 8px 0; flex: 1; text-align: center; font-size: 12px; cursor: pointer; }
-
-        /* AI Підказки */
-        .ai-header { display: flex; align-items: center; justify-content: space-between; font-weight: bold; font-size: 16px; color: #c084fc; cursor: pointer; }
-        .food-card { background-color: var(--bg-color); border-radius: 12px; padding: 15px; margin-bottom: 10px; border: 1px solid transparent; }
         
-        /* Прийоми їжі */
+        .ai-header { display: flex; align-items: center; justify-content: space-between; font-weight: bold; font-size: 16px; color: #c084fc; cursor: pointer; }
+        .food-card { background-color: var(--bg-color); border-radius: 12px; padding: 15px; margin-bottom: 10px; }
+        .food-header { display: flex; justify-content: space-between; margin-bottom: 5px; } .food-title { font-weight: bold; font-size: 15px; } .food-weight { color: var(--text-muted); font-size: 13px; }
+        .food-macros { font-size: 12px; margin-bottom: 8px; color: white;} .food-desc { font-size: 12px; color: var(--text-muted); }
         .meals-header { display: flex; justify-content: space-between; align-items: center; margin: 20px 0 15px 0; }
         .btn-add-meal { background-color: var(--primary-color); color: white; border: none; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: bold; cursor: pointer; }
-
-        /* --- ЕКРАН ДОДАВАННЯ СТРАВИ --- */
+        
         .back-btn { background: none; border: none; color: white; font-size: 20px; cursor: pointer; padding: 0; }
-        .tabs-container { display: flex; gap: 10px; margin-bottom: 20px; }
-        .tab-btn { background-color: var(--bg-color); color: var(--text-muted); border: none; padding: 10px; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; flex: 1; }
-        .tab-btn.active { background-color: var(--card-bg); color: white; border: 1px solid var(--border-color); }
+        .tabs-container { display: flex; gap: 10px; margin-bottom: 20px; } .tab-btn { background-color: var(--bg-color); color: var(--text-muted); border: none; padding: 10px; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; flex: 1; } .tab-btn.active { background-color: var(--card-bg); color: white; border: 1px solid var(--border-color); }
         
-        .meal-type-btn { background-color: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-muted); padding: 8px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; white-space: nowrap; }
-        .meal-type-btn.active { background-color: rgba(213, 40, 133, 0.15); border-color: var(--primary-color); color: white; }
-
-        /* --- СТИЛІ СТАТИСТИКИ (НОВЕ) --- */
+        /* СТАТИСТИКА */
         #statistics-view .header-date { justify-content: center; gap: 20px; }
-        
-        /* Календар */
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; margin-bottom: 20px; }
         .cal-day-label { font-size: 12px; color: var(--text-muted); margin-bottom: 5px; }
         .cal-date { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 14px; cursor: pointer; position: relative; }
         .cal-date.active { background-color: var(--primary-color); font-weight: bold; }
-        .cal-date.has-data::after { content: ''; position: absolute; bottom: 4px; width: 4px; height: 4px; background-color: rgba(255,255,255,0.5); border-radius: 50%; }
-
-        /* Смужки статистики */
         .stat-row { display: flex; flex-direction: column; gap: 5px; margin-bottom: 15px; }
         .stat-label-row { display: flex; justify-content: space-between; align-items: baseline; }
-        .stat-title { font-size: 15px; font-weight: bold; }
-        .stat-value { font-size: 13px; }
-        .stat-percent { font-weight: bold; font-size: 18px; margin-right: 5px; }
-        
+        .stat-title { font-size: 15px; font-weight: bold; } .stat-value { font-size: 13px; } .stat-percent { font-weight: bold; font-size: 18px; margin-right: 5px; }
         .stat-bar-bg { width: 100%; height: 12px; background-color: var(--border-color); border-radius: 6px; overflow: hidden; }
         .stat-bar-fill { height: 100%; border-radius: 6px; width: 0%; transition: width 0.5s ease; }
-
-        /* Нижнє меню */
+        
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background-color: var(--card-bg); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; padding: 10px 0 25px 0; z-index: 100; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); font-size: 11px; cursor: pointer; width: 50%; }
-        .nav-item.active { color: var(--primary-color); }
-        .nav-icon { font-size: 20px; }
-
-        /* Опціонні картки */
-        .option-list { display: flex; flex-direction: column; gap: 10px; }
-        .option-card { background-color: var(--bg-color); border: 2px solid transparent; border-radius: 12px; padding: 15px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 15px; }
-        .option-card.selected { border-color: var(--primary-color); background-color: rgba(213, 40, 133, 0.1); }
-        .option-icon { font-size: 28px; } .option-text { font-weight: bold; font-size: 16px; } .option-desc { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-
-        /* Модальне */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 200; display: none; align-items: flex-end; justify-content: center; }
-        .modal-content { background: var(--bg-color); width: 100%; max-width: 500px; border-radius: 20px 20px 0 0; padding: 20px; box-sizing: border-box; animation: slideUp 0.3s ease-out; }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); font-size: 11px; cursor: pointer; width: 50%; } .nav-item.active { color: var(--primary-color); }
+        
+        .option-list { display: flex; flex-direction: column; gap: 10px; } .option-card { background-color: var(--bg-color); border: 2px solid transparent; border-radius: 12px; padding: 15px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 15px; } .option-card.selected { border-color: var(--primary-color); background-color: rgba(213, 40, 133, 0.1); } .option-icon { font-size: 28px; } .option-text { font-weight: bold; font-size: 16px; } .option-desc { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
     </style>
 </head>
 <body>
 
     <div id="onboarding" class="onboarding-container" style="display: none;">
-        <div id="step1" class="step active"><div class="step-content"><div class="welcome-icon">🍽</div><h2>Ласкаво просимо!</h2><p class="subtitle">FoodApp допоможе вам відстежувати харчування. Давайте налаштуємо ваш профіль!</p></div><div class="nav-buttons"><button class="btn btn-primary" onclick="nextStep(2)">Далі ></button></div></div>
+        <div id="step1" class="step active"><div class="step-content"><div class="welcome-icon">🍽</div><h2>Ласкаво просимо!</h2><p class="subtitle">FoodApp допоможе вам відстежувати харчування.</p></div><div class="nav-buttons"><button class="btn btn-primary" onclick="nextStep(2)">Далі ></button></div></div>
         <div id="step2" class="step"><div class="step-content"><div class="card-container"><h2 style="margin-top:0;">Ваша стать</h2><div style="display: flex; gap: 15px;"><div class="option-card" style="flex:1; flex-direction:column; text-align:center;" onclick="selectOption('gender', 'male', this)"><div class="option-icon">👨</div><div class="option-text">Чоловіча</div></div><div class="option-card" style="flex:1; flex-direction:column; text-align:center;" onclick="selectOption('gender', 'female', this)"><div class="option-icon">👩</div><div class="option-text">Жіноча</div></div></div></div></div><div class="nav-buttons"><button class="btn btn-secondary" onclick="nextStep(1)">< Назад</button><button class="btn btn-primary" onclick="nextStep(3)">Далі ></button></div></div>
         <div id="step3" class="step"><div class="step-content"><div class="card-container"><h2 style="margin-top:0;">Параметри тіла</h2><div class="input-group"><label>Вік</label><input type="number" id="age" placeholder="25"></div><div class="input-group"><label>Зріст (см)</label><input type="number" id="height" placeholder="175"></div><div class="input-group" style="margin-bottom:0;"><label>Вага (кг)</label><input type="number" id="weight" placeholder="70"></div></div></div><div class="nav-buttons"><button class="btn btn-secondary" onclick="nextStep(2)">< Назад</button><button class="btn btn-primary" onclick="nextStep(4)">Далі ></button></div></div>
-        <div id="step4" class="step"><div class="step-content"><div class="card-container"><h2 style="margin-top:0;">Ваша ціль</h2><div class="option-list"><div class="option-card" onclick="selectOption('goal', 'lose', this)"><div class="option-icon">📉</div><div><div class="option-text">Схуднення</div><div class="option-desc">Знизити вагу</div></div></div><div class="option-card" onclick="selectOption('goal', 'maintain', this)"><div class="option-icon">⚖️</div><div><div class="option-text">Підтримка</div><div class="option-desc">Зберегти вагу</div></div></div></div></div></div><div class="nav-buttons"><button class="btn btn-secondary" onclick="nextStep(3)">< Назад</button><button class="btn btn-primary" onclick="nextStep(5)">Далі ></button></div></div>
-        <div id="step5" class="step"><div class="step-content"><div class="card-container"><h2 style="margin-top:0;">Активність</h2><div class="option-list"><div class="option-card" onclick="selectOption('activity', 'low', this)"><div class="option-icon">🛋</div><div><div class="option-text">Низька</div><div class="option-desc">Сидячий спосіб життя</div></div></div><div class="option-card" onclick="selectOption('activity', 'medium', this)"><div class="option-icon">🚶</div><div><div class="option-text">Середня</div><div class="option-desc">1-3 тренування на тиждень</div></div></div></div></div></div><div class="nav-buttons"><button class="btn btn-secondary" onclick="nextStep(4)">< Назад</button><button class="btn btn-primary" onclick="finishOnboarding()">Почати!</button></div></div>
+        <div id="step4" class="step"><div class="step-content"><div class="card-container"><h2 style="margin-top:0;">Ваша ціль</h2><div class="option-list">
+            <div class="option-card" onclick="selectOption('goal', 'lose', this)"><div class="option-icon">📉</div><div><div class="option-text">Схуднення</div><div class="option-desc">Знизити вагу</div></div></div>
+            <div class="option-card" onclick="selectOption('goal', 'gain', this)"><div class="option-icon">📈</div><div><div class="option-text">Набір маси</div><div class="option-desc">Збільшити вагу</div></div></div>
+            <div class="option-card" onclick="selectOption('goal', 'maintain', this)"><div class="option-icon">⚖️</div><div><div class="option-text">Підтримка</div><div class="option-desc">Зберегти вагу</div></div></div>
+        </div></div></div><div class="nav-buttons"><button class="btn btn-secondary" onclick="nextStep(3)">< Назад</button><button class="btn btn-primary" onclick="nextStep(5)">Далі ></button></div></div>
+        <div id="step5" class="step"><div class="step-content"><div class="card-container"><h2 style="margin-top:0;">Активність</h2><div class="option-list">
+            <div class="option-card" onclick="selectOption('activity', 'low', this)"><div class="option-icon">🛋</div><div><div class="option-text">Низька</div><div class="option-desc">Сидячий спосіб життя</div></div></div>
+            <div class="option-card" onclick="selectOption('activity', 'medium', this)"><div class="option-icon">🚶</div><div><div class="option-text">Середня</div><div class="option-desc">1-3 тренування на тиждень</div></div></div>
+            <div class="option-card" onclick="selectOption('activity', 'high', this)"><div class="option-icon">🏃</div><div><div class="option-text">Висока</div><div class="option-desc">4+ тренувань на тиждень</div></div></div>
+        </div></div></div><div class="nav-buttons"><button class="btn btn-secondary" onclick="nextStep(4)">< Назад</button><button class="btn btn-primary" onclick="finishOnboarding()">Почати!</button></div></div>
     </div>
 
     <div id="dashboard" class="main-view">
@@ -154,9 +106,7 @@
 
         <div class="dash-card" style="padding-bottom: 5px;">
             <div class="ai-header" onclick="toggleAI()"><span>✨ AI-підказки</span><span id="ai-arrow">^</span></div>
-            <div id="ai-content" class="ai-content">
-                <div style="text-align:center; padding:20px 0; color:var(--text-muted);" id="ai-loading">⏳ Завантаження підказок...</div>
-            </div>
+            <div id="ai-content" class="ai-content"><div style="text-align:center; padding:20px 0; color:var(--text-muted);">⏳ Завантаження підказок...</div></div>
         </div>
 
         <div class="meals-header"><span style="font-size:18px; font-weight:bold;">Прийоми їжі</span><button class="btn-add-meal" onclick="openAddMeal()">+ Додати</button></div>
@@ -166,20 +116,20 @@
     <div id="add-meal-view" class="main-view">
         <div class="view-header" style="display:flex; align-items:center; gap:15px; margin-bottom:20px; font-weight:bold;"><button class="back-btn" onclick="closeAddMeal()">←</button>Додати страву</div>
         <div class="tabs-container"><button class="tab-btn" onclick="switchTab('photo', this)">📷 Фото</button><button class="tab-btn active" onclick="switchTab('input', this)">✎ Ввід</button></div>
-        <div id="tab-photo" style="display:none;"><div class="photo-area"><div style="font-size:30px; color:var(--text-muted);">📷</div><div style="display:flex; gap:15px;"><button class="photo-btn">Камера</button><button class="photo-btn">Галерея</button></div></div></div>
+        <div id="tab-photo" style="display:none;"><div style="text-align:center; padding:40px; color:var(--text-muted);">Функція фото в розробці</div></div>
         <div id="tab-input" style="display:block;">
             <div class="dash-card">
                 <h3 style="margin-top:0; font-size:16px;">AI розрахунок</h3>
                 <div class="input-group"><label>Назва *</label><input type="text" id="food-name-input" placeholder="Наприклад: Кава з молоком"></div>
                 <div class="input-group"><label>Вага порції</label><div style="display:flex; gap:10px;"><input type="number" id="food-weight-input" placeholder="250" style="flex:1;"><span>г/мл</span></div></div>
                 <button class="btn btn-primary" style="width:100%;" id="calc-btn" onclick="calculateAI()">Розрахувати КБЖУ</button>
-                </div>
+            </div>
             <div id="ai-result-card" style="display:none; margin-top:15px; padding:15px; background-color:var(--card-bg); border-radius:16px;"></div>
         </div>
     </div>
 
     <div id="statistics-view" class="main-view">
-        <div class="header-date"><span class="arrow">‹</span><span>27 лютого</span><span class="arrow">›</span></div>
+        <div class="header-date"><span class="arrow">‹</span><span>Сьогодні</span><span class="arrow">›</span></div>
         <div class="dash-card">
             <h3 style="margin-top:0; font-size:16px;">Календар</h3>
             <div class="calendar-grid">
@@ -187,44 +137,21 @@
                 <div class="cal-date has-data">20</div><div class="cal-date has-data">21</div><div class="cal-date has-data">22</div><div class="cal-date has-data">23</div><div class="cal-date has-data">24</div><div class="cal-date has-data">25</div><div class="cal-date has-data">26</div>
                 <div class="cal-date has-data active">27</div><div class="cal-date">28</div><div class="cal-date" style="color:var(--text-muted);">1</div><div class="cal-date" style="color:var(--text-muted);">2</div><div class="cal-date" style="color:var(--text-muted);">3</div><div class="cal-date" style="color:var(--text-muted);">4</div><div class="cal-date" style="color:var(--text-muted);">5</div>
             </div>
-            <div style="background-color:var(--bg-color); padding:15px; border-radius:12px; display:flex; justify-content:space-between; align-items:center;">
-                <span style="font-size:14px;">Тижневий середній показник</span>
-                <span style="font-weight:bold; font-size:16px;">1745 ккал</span>
-            </div>
         </div>
         <div class="dash-card">
             <h3 style="margin-top:0; font-size:16px; margin-bottom:15px;">Розподіл макросів</h3>
-            
             <div class="stat-row">
-                <div class="stat-label-row">
-                    <div style="display:flex; align-items:center; gap:5px;"><span class="stat-percent" style="color:var(--purple-macros);">28%</span> <span class="stat-title">Білки</span></div>
-                    <span class="stat-value">122г / 488 ккал</span>
-                </div>
-                <div class="stat-bar-bg"><div class="stat-bar-fill" style="width:28%; background-color:var(--purple-macros);"></div></div>
+                <div class="stat-label-row"><div style="display:flex; align-items:center; gap:5px;"><span class="stat-percent" id="stat-p-percent" style="color:var(--purple-macros);">0%</span> <span class="stat-title">Білки</span></div><span class="stat-value" id="stat-p-val">0г / 0 ккал</span></div>
+                <div class="stat-bar-bg"><div class="stat-bar-fill" id="stat-p-bar" style="width:0%; background-color:var(--purple-macros);"></div></div>
             </div>
             <div class="stat-row">
-                <div class="stat-label-row">
-                    <div style="display:flex; align-items:center; gap:5px;"><span class="stat-percent" style="color:var(--orange-macros);">32%</span> <span class="stat-title">Жири</span></div>
-                    <span class="stat-value">62г / 558 ккал</span>
-                </div>
-                <div class="stat-bar-bg"><div class="stat-bar-fill" style="width:32%; background-color:var(--orange-macros);"></div></div>
+                <div class="stat-label-row"><div style="display:flex; align-items:center; gap:5px;"><span class="stat-percent" id="stat-f-percent" style="color:var(--orange-macros);">0%</span> <span class="stat-title">Жири</span></div><span class="stat-value" id="stat-f-val">0г / 0 ккал</span></div>
+                <div class="stat-bar-bg"><div class="stat-bar-fill" id="stat-f-bar" style="width:0%; background-color:var(--orange-macros);"></div></div>
             </div>
             <div class="stat-row" style="margin-bottom:0;">
-                <div class="stat-label-row">
-                    <div style="display:flex; align-items:center; gap:5px;"><span class="stat-percent" style="color:var(--blue-macros);">40%</span> <span class="stat-title">Вуглеводи</span></div>
-                    <span class="stat-value">175г / 699 ккал</span>
-                </div>
-                <div class="stat-bar-bg"><div class="stat-bar-fill" style="width:40%; background-color:var(--blue-macros);"></div></div>
+                <div class="stat-label-row"><div style="display:flex; align-items:center; gap:5px;"><span class="stat-percent" id="stat-c-percent" style="color:var(--blue-macros);">0%</span> <span class="stat-title">Вуглеводи</span></div><span class="stat-value" id="stat-c-val">0г / 0 ккал</span></div>
+                <div class="stat-bar-bg"><div class="stat-bar-fill" id="stat-c-bar" style="width:0%; background-color:var(--blue-macros);"></div></div>
             </div>
-        </div>
-    </div>
-
-    <div id="edit-meal-modal" class="modal-overlay">
-        <div class="modal-content">
-            <div style="display:flex; justify-content:space-between; margin-bottom:20px;"><h3>Редагувати</h3><span style="font-size:24px; cursor:pointer;" onclick="closeEditModal()">×</span></div>
-            <div class="input-group"><label>Назва</label><input type="text" id="edit-name"></div>
-            <div style="margin-bottom:15px;"><div style="font-weight:bold; font-size:14px; margin-bottom:8px;">Тип прийому</div><div style="display:flex; gap:10px;"><button class="meal-type-btn active">Сніданок</button><button class="meal-type-btn">Обід</button><button class="meal-type-btn">Вечеря</button></div></div>
-            <button class="btn btn-primary" style="width:100%;" onclick="closeEditModal()">Зберегти</button>
         </div>
     </div>
 
@@ -241,6 +168,7 @@
         let targetMacros = { cals: 0, p: 0, f: 0, c: 0 };
         let consumedMacros = { cals: 0, p: 0, f: 0, c: 0 };
         let currentTempMeal = {};
+        let currentWater = 0;
 
         // ⚠️⚠️⚠️ ВСТАВ СЮДИ СВІЙ NGROK URL ⚠️⚠️⚠️
         const API_URL = "https://kirby-hypoxanthic-milagro.ngrok-free.dev"; 
@@ -251,50 +179,63 @@
                 const response = await fetch(`${API_URL}/api/get_user?telegram_id=${tg_id}`, { method: "GET", headers: { "ngrok-skip-browser-warning": "true" }});
                 const data = await response.json();
                 if (data.exists) {
-                    targetMacros = { cals: data.target_calories, p: data.target_p, f: data.target_f, c: data.target_c };
+                    targetMacros = { cals: Number(data.target_calories)||0, p: Number(data.target_p)||0, f: Number(data.target_f)||0, c: Number(data.target_c)||0 };
                     updateProgressUI();
                     document.getElementById('dashboard').style.display = 'flex';
                     document.getElementById('bottom-nav').style.display = 'flex';
-                    loadDynamicAITips(); // Завантажуємо розумні підказки
+                    loadDynamicAITips(); 
                 } else { document.getElementById('onboarding').style.display = 'flex'; }
             } catch (error) { document.getElementById('onboarding').style.display = 'flex'; }
         }
         checkUserOnLoad();
 
-        // НОВЕ: Завантаження підказок, згенерованих ШІ
         async function loadDynamicAITips() {
             const container = document.getElementById('ai-content');
             try {
                 const response = await fetch(`${API_URL}/api/get_ai_tips`, { method: "GET", headers: { "ngrok-skip-browser-warning": "true" }});
                 const data = await response.json();
-                
+                if(!data.tip_text) throw new Error("No data");
                 let html = `<div class="ai-text">${data.tip_text}</div>`;
-                data.foods.forEach(food => {
-                    html += `
-                        <div class="food-card">
-                            <div class="food-header"><span class="food-title">${food.name}</span> <span class="food-weight">${food.weight}</span></div>
-                            <div class="food-macros">${food.cals} ккал &nbsp; <span style="color:var(--purple-macros);">Б:${food.p}г</span> &nbsp; <span style="color:var(--orange-macros);">Ж:${food.f}г</span> &nbsp; <span style="color:var(--blue-macros);">В:${food.c}г</span></div>
-                            <div class="food-desc">${food.desc}</div>
-                        </div>
-                    `;
-                });
+                if(data.foods) {
+                    data.foods.forEach(food => {
+                        html += `<div class="food-card"><div class="food-header"><span class="food-title">${food.name}</span> <span class="food-weight">${food.weight}</span></div><div class="food-macros">${food.cals} ккал &nbsp; <span style="color:var(--purple-macros);">Б:${food.p}г</span> &nbsp; <span style="color:var(--orange-macros);">Ж:${food.f}г</span> &nbsp; <span style="color:var(--blue-macros);">В:${food.c}г</span></div><div class="food-desc">${food.desc || ''}</div></div>`;
+                    });
+                }
                 container.innerHTML = html;
-            } catch (e) { container.innerHTML = '<div class="ai-text">Не вдалося завантажити поради ШІ.</div>'; }
+            } catch (e) { container.innerHTML = '<div class="ai-text">Збалансоване харчування - запорука здоров\'я.</div>'; }
         }
 
         function updateProgressUI() {
+            // Оновлення головної сторінки
             document.getElementById('cal-target').innerText = targetMacros.cals;
             document.getElementById('cal-consumed').innerText = consumedMacros.cals;
-            let calPercent = Math.min((consumedMacros.cals / targetMacros.cals) * 100, 100) || 0;
+            let calPercent = Math.min((consumedMacros.cals / (targetMacros.cals || 1)) * 100, 100) || 0;
             document.getElementById('cal-circle').style.background = `conic-gradient(var(--primary-color) ${calPercent}%, var(--border-color) 0)`;
             
             document.getElementById('p-text').innerText = `${consumedMacros.p}/${targetMacros.p} г`;
             document.getElementById('f-text').innerText = `${consumedMacros.f}/${targetMacros.f} г`;
             document.getElementById('c-text').innerText = `${consumedMacros.c}/${targetMacros.c} г`;
             
-            document.getElementById('p-bar').style.width = Math.min((consumedMacros.p / targetMacros.p) * 100, 100) + '%';
-            document.getElementById('f-bar').style.width = Math.min((consumedMacros.f / targetMacros.f) * 100, 100) + '%';
-            document.getElementById('c-bar').style.width = Math.min((consumedMacros.c / targetMacros.c) * 100, 100) + '%';
+            document.getElementById('p-bar').style.width = Math.min((consumedMacros.p / (targetMacros.p || 1)) * 100, 100) + '%';
+            document.getElementById('f-bar').style.width = Math.min((consumedMacros.f / (targetMacros.f || 1)) * 100, 100) + '%';
+            document.getElementById('c-bar').style.width = Math.min((consumedMacros.c / (targetMacros.c || 1)) * 100, 100) + '%';
+
+            // Оновлення сторінки Статистики (справжні дані замість фейкових)
+            document.getElementById('stat-p-val').innerText = `${consumedMacros.p}г / ${targetMacros.p*4} ккал`;
+            document.getElementById('stat-f-val').innerText = `${consumedMacros.f}г / ${targetMacros.f*9} ккал`;
+            document.getElementById('stat-c-val').innerText = `${consumedMacros.c}г / ${targetMacros.c*4} ккал`;
+
+            let pPerc = targetMacros.p ? Math.round((consumedMacros.p / targetMacros.p) * 100) : 0;
+            let fPerc = targetMacros.f ? Math.round((consumedMacros.f / targetMacros.f) * 100) : 0;
+            let cPerc = targetMacros.c ? Math.round((consumedMacros.c / targetMacros.c) * 100) : 0;
+
+            document.getElementById('stat-p-percent').innerText = `${Math.min(pPerc, 100)}%`;
+            document.getElementById('stat-f-percent').innerText = `${Math.min(fPerc, 100)}%`;
+            document.getElementById('stat-c-percent').innerText = `${Math.min(cPerc, 100)}%`;
+
+            document.getElementById('stat-p-bar').style.width = `${Math.min(pPerc, 100)}%`;
+            document.getElementById('stat-f-bar').style.width = `${Math.min(fPerc, 100)}%`;
+            document.getElementById('stat-c-bar').style.width = `${Math.min(cPerc, 100)}%`;
         }
 
         async function calculateAI() {
@@ -307,17 +248,27 @@
                 const query = weight ? `${name} ${weight}г` : name;
                 const response = await fetch(`${API_URL}/api/calculate_food`, { method: "POST", headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" }, body: JSON.stringify({ query }) });
                 const data = await response.json();
-                currentTempMeal = data;
+                
+                if (data.error || data.cals === undefined || isNaN(data.cals)) {
+                    tg.showAlert("ШІ не зміг розпізнати. Спробуйте написати простіше.");
+                    return;
+                }
+
+                currentTempMeal = {
+                    name: data.name || name, weight: data.weight || weight || 100,
+                    cals: Number(data.cals) || 0, p: Number(data.p) || 0, f: Number(data.f) || 0, c: Number(data.c) || 0
+                };
+
                 result.style.display = 'block';
                 result.innerHTML = `
-                    <div style="font-weight:bold; margin-bottom:10px;">${data.name} (${data.weight}г)</div>
-                    <div style="font-size:18px; color:var(--primary-color); font-weight:bold; margin-bottom:15px;">${data.cals} ккал</div>
+                    <div style="font-weight:bold; margin-bottom:10px;">${currentTempMeal.name} (${currentTempMeal.weight}г)</div>
+                    <div style="font-size:18px; color:var(--primary-color); font-weight:bold; margin-bottom:15px;">${currentTempMeal.cals} ккал</div>
                     <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
-                        <span style="color:var(--purple-macros);">Б: ${data.p}г</span><span style="color:var(--orange-macros);">Ж: ${data.f}г</span><span style="color:var(--blue-macros);">В: ${data.c}г</span>
+                        <span style="color:var(--purple-macros);">Б: ${currentTempMeal.p}г</span><span style="color:var(--orange-macros);">Ж: ${currentTempMeal.f}г</span><span style="color:var(--blue-macros);">В: ${currentTempMeal.c}г</span>
                     </div>
                     <button class="btn btn-primary" style="width:100%; padding:12px;" onclick="confirmAddMeal()">✓ Додати</button>
                 `;
-            } catch (e) { tg.showAlert("Помилка."); } finally { btn.innerText = "Розрахувати КБЖУ"; btn.disabled = false; }
+            } catch (e) { tg.showAlert("Не вдалося підключитися до сервера."); } finally { btn.innerText = "Розрахувати КБЖУ"; btn.disabled = false; }
         }
 
         function confirmAddMeal() {
@@ -330,30 +281,34 @@
             closeAddMeal();
         }
 
-        // Перемикання між Головною та Статистикою
-        function switchMainView(viewName, navItem) {
-            document.querySelectorAll('.main-view').forEach(el => el.style.display = 'none');
-            document.getElementById(viewName + '-view').style.display = 'flex';
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            navItem.classList.add('active');
-            window.scrollTo(0,0);
+        function addWater(amount) {
+            currentWater += amount; 
+            document.getElementById('current-water').innerText = currentWater; 
+            document.getElementById('water-bar').style.width = Math.min((currentWater / 1500) * 100, 100) + '%'; 
+        }
+
+        // ВИПРАВЛЕНА НАВІГАЦІЯ
+        function switchMainView(viewName, navItem) { 
+            document.querySelectorAll('.main-view').forEach(el => el.style.display = 'none'); 
+            document.getElementById(viewName + '-view').style.display = 'flex'; 
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active')); 
+            navItem.classList.add('active'); 
+            window.scrollTo(0,0); 
         }
 
         function toggleAI() { const c = document.getElementById('ai-content'); const a = document.getElementById('ai-arrow'); if(c.style.display==='none'){c.style.display='block'; a.innerText='^';}else{c.style.display='none'; a.innerText='v';} }
         function openAddMeal() { document.querySelectorAll('.main-view').forEach(e=>e.style.display='none'); document.getElementById('add-meal-view').style.display='flex'; document.getElementById('bottom-nav').style.display='none'; }
         function closeAddMeal() { document.getElementById('add-meal-view').style.display='none'; document.getElementById('dashboard').style.display='flex'; document.getElementById('bottom-nav').style.display='flex'; document.getElementById('ai-result-card').style.display='none'; }
         function switchTab(t,b){ document.getElementById('tab-photo').style.display=t==='photo'?'block':'none'; document.getElementById('tab-input').style.display=t==='input'?'block':'none'; document.querySelectorAll('.tab-btn').forEach(e=>e.classList.remove('active')); b.classList.add('active'); }
-        function openEditModal(){ document.getElementById('edit-meal-modal').style.display='flex'; } function closeEditModal(){ document.getElementById('edit-meal-modal').style.display='none'; }
         function nextStep(s){ document.querySelectorAll('.step').forEach(e=>e.classList.remove('active')); document.getElementById('step'+s).classList.add('active'); }
         function selectOption(c,v,e){ userData[c]=v; e.parentElement.querySelectorAll('.option-card').forEach(x=>x.classList.remove('selected')); e.classList.add('selected'); }
-        function addWater(a){ currentWater+=a; document.getElementById('current-water').innerText=currentWater; document.getElementById('water-bar').style.width=Math.min((currentWater/1500)*100,100)+'%'; }
 
         function finishOnboarding() {
             userData.age = parseInt(document.getElementById('age').value); userData.height = parseInt(document.getElementById('height').value); userData.weight = parseInt(document.getElementById('weight').value);
             if(!userData.gender || !userData.age || !userData.height || !userData.weight || !userData.goal || !userData.activity){ tg.showAlert("Заповніть поля!"); return; }
             let bmr = (10*userData.weight)+(6.25*userData.height)-(5*userData.age)+(userData.gender==='male'?5:-161);
-            let tdee = bmr * (userData.activity==='low'?1.2:1.55);
-            if(userData.goal==='lose') tdee-=400;
+            let tdee = bmr * (userData.activity==='low'?1.2: (userData.activity==='medium'?1.55:1.725));
+            if(userData.goal==='lose') tdee-=400; if(userData.goal==='gain') tdee+=400;
             targetMacros.cals = Math.round(tdee); targetMacros.p=Math.round(targetMacros.cals*0.3/4); targetMacros.f=Math.round(targetMacros.cals*0.3/9); targetMacros.c=Math.round(targetMacros.cals*0.4/4);
             updateProgressUI();
             userData.telegram_id = tg.initDataUnsafe?.user?.id || 123456789; userData.macros = targetMacros;
