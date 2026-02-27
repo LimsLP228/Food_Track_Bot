@@ -6,11 +6,19 @@
     <title>FoodApp Onboarding</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        /* Базові стилі, беремо темну тему Telegram */
+        :root {
+            --bg-color: #0d0d12;
+            --card-bg: #1a1a24;
+            --primary-color: #d52885;
+            --text-color: #ffffff;
+            --text-muted: #8e8e93;
+            --border-color: #2c2c35;
+        }
+
         body {
-            background-color: var(--tg-theme-bg-color, #181818);
-            color: var(--tg-theme-text-color, #ffffff);
-            font-family: Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
             padding: 20px;
             display: flex;
@@ -20,114 +28,288 @@
             box-sizing: border-box;
         }
 
-        /* Стиль для екранів (кроків). За замовчуванням вони приховані */
         .step {
             display: none;
             width: 100%;
             max-width: 400px;
-            text-align: center;
             flex-grow: 1;
+            flex-direction: column;
         }
 
-        /* Клас для активного (видимого) екрану */
         .step.active {
+            display: flex;
+        }
+
+        .step-content {
+            flex-grow: 1;
             display: flex;
             flex-direction: column;
             justify-content: center;
         }
 
-        /* Стиль кнопок */
-        .btn-primary {
-            background-color: #d82b88; /* Рожевий колір з твого дизайну */
-            color: white;
-            border: none;
-            padding: 15px;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: bold;
-            width: 100%;
-            cursor: pointer;
-            margin-top: 20px;
+        h2 { text-align: center; margin-bottom: 20px; font-size: 22px; }
+        p.subtitle { text-align: center; color: var(--text-muted); font-size: 14px; margin-bottom: 30px; }
+
+        /* Картки вибору (Стать, Ціль, Активність) */
+        .card-container {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
         }
 
-        /* Картки вибору статі */
-        .options-grid {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
-        }
+        .option-grid { display: flex; gap: 15px; }
+        .option-list { display: flex; flex-direction: column; gap: 10px; }
+
         .option-card {
-            background-color: #23232b; /* Темніший фон картки */
-            border: 1px solid #333;
+            background-color: var(--bg-color);
+            border: 2px solid transparent;
             border-radius: 12px;
-            padding: 20px;
+            padding: 15px;
+            cursor: pointer;
+            text-align: center;
             flex: 1;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        /* Вертикальне вирівнювання для статі */
+        .option-grid .option-card { flex-direction: column; gap: 5px; }
+
+        .option-card.selected {
+            border-color: var(--primary-color);
+            background-color: rgba(213, 40, 133, 0.1);
+        }
+
+        .option-icon { font-size: 28px; }
+        .option-text { font-weight: bold; font-size: 16px; }
+        .option-desc { font-size: 12px; color: var(--text-muted); margin-top: 4px; font-weight: normal; text-align: left; }
+
+        /* Поля вводу (Параметри тіла) */
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; font-weight: bold; margin-bottom: 8px; font-size: 14px; }
+        .input-group input {
+            width: 100%;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        .input-group input:focus { outline: none; border-color: var(--primary-color); }
+
+        /* Кнопки навігації */
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            margin-top: 20px;
+            padding-bottom: 20px;
+        }
+
+        .btn {
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
             cursor: pointer;
             text-align: center;
         }
-        .option-card:active, .option-card.selected {
-            border-color: #d82b88; /* Рожева рамка при виділенні */
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            flex: 2;
         }
+
+        .btn-secondary {
+            background-color: var(--card-bg);
+            color: white;
+            border: 1px solid var(--border-color);
+            flex: 1;
+        }
+        
+        .welcome-icon { font-size: 60px; text-align: center; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
     <div id="step1" class="step active">
-        <h2>Ласкаво просимо!</h2>
-        <div style="font-size: 50px; margin: 20px 0;">🍽</div>
-        <p>FoodApp допоможе вам відстежувати харчування та досягати цілей. Давайте налаштуємо ваш профіль!</p>
-        
-        <div style="flex-grow: 1;"></div> 
-        
-        <button class="btn-primary" onclick="nextStep(2)">Далі ></button>
+        <div class="step-content">
+            <div class="welcome-icon">🍽</div>
+            <h2>Ласкаво просимо!</h2>
+            <p class="subtitle">FoodApp допоможе вам відстежувати харчування та досягати цілей. Давайте налаштуємо ваш профіль!</p>
+        </div>
+        <div class="nav-buttons">
+            <button class="btn btn-primary" onclick="nextStep(2)">Далі ></button>
+        </div>
     </div>
 
     <div id="step2" class="step">
-        <h2>Ваша стать</h2>
-        <div class="options-grid">
-            <div class="option-card" onclick="selectGender('Чоловіча', this)">
-                <div style="font-size: 30px;">👨</div>
-                <div>Чоловіча</div>
-            </div>
-            <div class="option-card" onclick="selectGender('Жіноча', this)">
-                <div style="font-size: 30px;">👩</div>
-                <div>Жіноча</div>
+        <div class="step-content">
+            <div class="card-container">
+                <h2 style="margin-top:0;">Ваша стать</h2>
+                <div class="option-grid">
+                    <div class="option-card" onclick="selectOption('gender', 'male', this)">
+                        <div class="option-icon">👨</div>
+                        <div class="option-text">Чоловіча</div>
+                    </div>
+                    <div class="option-card" onclick="selectOption('gender', 'female', this)">
+                        <div class="option-icon">👩</div>
+                        <div class="option-text">Жіноча</div>
+                    </div>
+                </div>
             </div>
         </div>
+        <div class="nav-buttons">
+            <button class="btn btn-secondary" onclick="nextStep(1)">< Назад</button>
+            <button class="btn btn-primary" onclick="nextStep(3)">Далі ></button>
+        </div>
+    </div>
 
-        <div style="flex-grow: 1;"></div>
-        
-        <div style="display: flex; gap: 10px; width: 100%;">
-            <button class="btn-primary" style="background-color: #23232b;" onclick="nextStep(1)">< Назад</button>
-            <button class="btn-primary" onclick="nextStep(3)">Далі ></button>
+    <div id="step3" class="step">
+        <div class="step-content">
+            <div class="card-container">
+                <h2 style="margin-top:0;">Параметри тіла</h2>
+                <div class="input-group">
+                    <label>Вік</label>
+                    <input type="number" id="age" placeholder="Наприклад: 25">
+                </div>
+                <div class="input-group">
+                    <label>Зріст (см)</label>
+                    <input type="number" id="height" placeholder="Наприклад: 175">
+                </div>
+                <div class="input-group" style="margin-bottom: 0;">
+                    <label>Вага (кг)</label>
+                    <input type="number" id="weight" placeholder="Наприклад: 70">
+                </div>
+            </div>
+        </div>
+        <div class="nav-buttons">
+            <button class="btn btn-secondary" onclick="nextStep(2)">< Назад</button>
+            <button class="btn btn-primary" onclick="nextStep(4)">Далі ></button>
+        </div>
+    </div>
+
+    <div id="step4" class="step">
+        <div class="step-content">
+            <div class="card-container">
+                <h2 style="margin-top:0;">Ваша ціль</h2>
+                <div class="option-list">
+                    <div class="option-card" onclick="selectOption('goal', 'lose', this)">
+                        <div class="option-icon">📉</div>
+                        <div>
+                            <div class="option-text">Схуднення</div>
+                            <div class="option-desc">Знизити вагу</div>
+                        </div>
+                    </div>
+                    <div class="option-card" onclick="selectOption('goal', 'gain', this)">
+                        <div class="option-icon">📈</div>
+                        <div>
+                            <div class="option-text">Набір маси</div>
+                            <div class="option-desc">Збільшити вагу</div>
+                        </div>
+                    </div>
+                    <div class="option-card" onclick="selectOption('goal', 'maintain', this)">
+                        <div class="option-icon">⚖️</div>
+                        <div>
+                            <div class="option-text">Підтримка</div>
+                            <div class="option-desc">Зберегти вагу</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="nav-buttons">
+            <button class="btn btn-secondary" onclick="nextStep(3)">< Назад</button>
+            <button class="btn btn-primary" onclick="nextStep(5)">Далі ></button>
+        </div>
+    </div>
+
+    <div id="step5" class="step">
+        <div class="step-content">
+            <div class="card-container">
+                <h2 style="margin-top:0;">Рівень активності</h2>
+                <div class="option-list">
+                    <div class="option-card" onclick="selectOption('activity', 'low', this)">
+                        <div class="option-icon">🛋</div>
+                        <div>
+                            <div class="option-text">Низька</div>
+                            <div class="option-desc">Сидячий спосіб життя</div>
+                        </div>
+                    </div>
+                    <div class="option-card" onclick="selectOption('activity', 'medium', this)">
+                        <div class="option-icon">🚶</div>
+                        <div>
+                            <div class="option-text">Середня</div>
+                            <div class="option-desc">1-3 тренування на тиждень</div>
+                        </div>
+                    </div>
+                    <div class="option-card" onclick="selectOption('activity', 'high', this)">
+                        <div class="option-icon">🏃</div>
+                        <div>
+                            <div class="option-text">Висока</div>
+                            <div class="option-desc">4+ тренувань на тиждень</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="nav-buttons">
+            <button class="btn btn-secondary" onclick="nextStep(4)">< Назад</button>
+            <button class="btn btn-primary" onclick="finishOnboarding()">Почати!</button>
         </div>
     </div>
 
     <script>
-        // Ініціалізуємо Telegram Web App
         const tg = window.Telegram.WebApp;
-        tg.expand(); // Розгортаємо на весь екран
+        tg.expand();
         tg.ready();
 
-        // Об'єкт для збереження даних користувача (стать, вік, вага тощо)
-        let userData = {};
+        let userData = {
+            gender: null,
+            age: null,
+            height: null,
+            weight: null,
+            goal: null,
+            activity: null
+        };
 
-        // Функція для перемикання екранів
         function nextStep(stepNumber) {
-            // Ховаємо всі кроки
             document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
-            // Показуємо потрібний
             document.getElementById('step' + stepNumber).classList.add('active');
         }
 
-        // Функція для вибору статі
-        function selectGender(gender, element) {
-            userData.gender = gender; // Зберігаємо вибір
+        function selectOption(category, value, element) {
+            userData[category] = value;
             
-            // Забираємо виділення з усіх карток
-            document.querySelectorAll('#step2 .option-card').forEach(el => el.classList.remove('selected'));
-            // Додаємо виділення (рамку) на натиснуту картку
+            // Забираємо виділення у сусідів по цій категорії
+            const parent = element.parentElement;
+            parent.querySelectorAll('.option-card').forEach(el => el.classList.remove('selected'));
+            
+            // Додаємо виділення натиснутій картці
             element.classList.add('selected');
+        }
+
+        function finishOnboarding() {
+            // Збираємо дані з полів вводу
+            userData.age = document.getElementById('age').value;
+            userData.height = document.getElementById('height').value;
+            userData.weight = document.getElementById('weight').value;
+
+            // Перевіряємо, чи всі дані заповнені (спрощена перевірка)
+            if(!userData.gender || !userData.age || !userData.height || !userData.weight || !userData.goal || !userData.activity) {
+                tg.showAlert("Будь ласка, заповніть всі поля перед початком!");
+                return;
+            }
+
+            // Відправляємо дані назад у бот (Python)
+            tg.sendData(JSON.stringify(userData));
         }
     </script>
 
