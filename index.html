@@ -338,11 +338,52 @@
     </nav>
 
     <script>
+        <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
         tg.ready();
 
         let userData = { gender: null, age: null, height: null, weight: null, goal: null, activity: null };
+        
+        // ВАЖЛИВО: Встав сюди своє поточне посилання з Ngrok!
+        const API_URL = "https://kirby-hypoxanthic-milagro.ngrok-free.dev"; 
+
+        // Одразу ховаємо онбординг, поки чекаємо відповідь від сервера
+        document.getElementById('onboarding').style.display = 'none';
+
+        // Функція, яка запускається при відкритті додатка
+        async function checkUserOnLoad() {
+            const tg_id = tg.initDataUnsafe?.user?.id || 123456789;
+
+            try {
+                // Запитуємо у нашого Python-бота: чи є такий юзер?
+                const response = await fetch(`${API_URL}/api/get_user?telegram_id=${tg_id}`);
+                const data = await response.json();
+
+                if (data.exists) {
+                    // Користувач Є В БАЗІ! 
+                    // 1. Підставляємо його збережені макроси на головний екран
+                    document.getElementById('cal-target').innerText = data.target_calories;
+                    document.getElementById('p-text').innerText = `0/${data.target_p} г`;
+                    document.getElementById('f-text').innerText = `0/${data.target_f} г`;
+                    document.getElementById('c-text').innerText = `0/${data.target_c} г`;
+
+                    // 2. Відкриваємо дашборд (минаємо онбординг)
+                    document.getElementById('dashboard').style.display = 'flex';
+                    document.getElementById('bottom-nav').style.display = 'flex';
+                } else {
+                    // Користувача НЕМАЄ. Показуємо вікно реєстрації.
+                    document.getElementById('onboarding').style.display = 'flex';
+                }
+            } catch (error) {
+                console.error("Помилка підключення до сервера:", error);
+                // Якщо сервер вимкнений (або ngrok відпав), показуємо реєстрацію для підстраховки
+                document.getElementById('onboarding').style.display = 'flex';
+            }
+        }
+
+        // Запускаємо перевірку одразу при старті
+        checkUserOnLoad();
 
         // --- ЛОГІКА ОНБОРДИНГУ ---
         function nextStep(stepNumber) {
@@ -456,3 +497,4 @@
 
 </body>
 </html>
+
