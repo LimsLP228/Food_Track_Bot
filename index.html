@@ -106,7 +106,12 @@
 
         <div class="dash-card" style="padding-bottom: 5px;">
             <div class="ai-header" onclick="toggleAI()"><span>✨ AI-підказки</span><span id="ai-arrow">^</span></div>
-            <div id="ai-content" class="ai-content"><div style="text-align:center; padding:20px 0; color:var(--text-muted);">⏳ Завантаження підказок...</div></div>
+            <div id="ai-content" class="ai-content">
+                <div id="ai-text-container">
+                    <div style="text-align:center; padding:15px 0; color:var(--text-muted);">Натисніть кнопку нижче, щоб отримати персональну пораду від дієтолога.</div>
+                </div>
+                <button class="btn btn-secondary" id="ai-gen-btn" style="width:100%; margin-bottom:10px;" onclick="loadDynamicAITips()">✨ Згенерувати підказку</button>
+            </div>
         </div>
 
         <div class="meals-header"><span style="font-size:18px; font-weight:bold;">Прийоми їжі</span><button class="btn-add-meal" onclick="openAddMeal()">+ Додати</button></div>
@@ -157,7 +162,7 @@
 
     <nav class="bottom-nav" id="bottom-nav" style="display:none;">
         <div class="nav-item active" onclick="switchMainView('dashboard', this)"><div class="nav-icon">🏠</div>Головна</div>
-        <div class="nav-item" onclick="switchMainView('statistics', this)"><div class="nav-icon">📊</div>Статистика</div>
+        <div class="nav-item" onclick="switchMainView('statistics-view', this)"><div class="nav-icon">📊</div>Статистика</div>
     </nav>
 
     <script>
@@ -169,10 +174,60 @@
         let consumedMacros = { cals: 0, p: 0, f: 0, c: 0 };
         let currentTempMeal = {};
         let currentWater = 0;
+        let mealsList = []; // Зберігаємо список страв
 
         // ⚠️⚠️⚠️ ВСТАВ СЮДИ СВІЙ NGROK URL ⚠️⚠️⚠️
         const API_URL = "https://kirby-hypoxanthic-milagro.ngrok-free.dev"; 
 
+        // --- ЛОКАЛЬНЕ ЗБЕРЕЖЕННЯ (ПАМ'ЯТЬ НА 1 ДЕНЬ) ---
+        function saveDailyData() {
+            const today = new Date().toISOString().split('T')[0]; // отримуємо дату типу 2026-02-27
+            const dataToSave = {
+                date: today,
+                consumedMacros: consumedMacros,
+                currentWater: currentWater,
+                mealsList: mealsList
+            };
+            localStorage.setItem('foodAppDailyData', JSON.stringify(dataToSave));
+        }
+
+        function loadDailyData() {
+            const savedData = localStorage.getItem('foodAppDailyData');
+            if (savedData) {
+                const parsed = JSON.parse(savedData);
+                const today = new Date().toISOString().split('T')[0];
+                
+                // Якщо дані збережені сьогодні - завантажуємо їх
+                if (parsed.date === today) {
+                    consumedMacros = parsed.consumedMacros || { cals: 0, p: 0, f: 0, c: 0 };
+                    currentWater = parsed.currentWater || 0;
+                    mealsList = parsed.mealsList || [];
+
+                    // Відновлюємо воду на екрані
+                    document.getElementById('current-water').innerText = currentWater;
+                    document.getElementById('water-bar').style.width = Math.min((currentWater / 1500) * 100, 100) + '%';
+
+                    // Відновлюємо список страв на екрані
+                    const container = document.getElementById('meals-container');
+                    if (mealsList.length > 0) {
+                        document.getElementById('empty-meals-msg').style.display = 'none';
+                        // Очищаємо контейнер (щоб не було дублів)
+                        container.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:30px 0; display:none;" id="empty-meals-msg">Поки немає записів</div>';
+                        
+                        mealsList.forEach(meal => {
+                            const card = document.createElement('div'); card.className = 'food-card';
+                            card.innerHTML = `<div class="food-header"><span class="food-title">${meal.name}</span> <span class="food-weight">${meal.weight}г</span></div><div class="food-macros">${meal.cals} ккал &nbsp; Б:${meal.p}г Ж:${meal.f}г В:${meal.c}г</div>`;
+                            container.appendChild(card);
+                        });
+                    }
+                } else {
+                    // Якщо настав новий день - стираємо старі дані (все почнеться з нуля)
+                    localStorage.removeItem('foodAppDailyData');
+                }
+            }
+        }
+
+        // --- ЗАВАНТАЖЕННЯ ДОДАТКА ---
         async function checkUserOnLoad() {
             const tg_id = tg.initDataUnsafe?.user?.id || 123456789;
             try {
@@ -180,21 +235,32 @@
                 const data = await response.json();
                 if (data.exists) {
                     targetMacros = { cals: Number(data.target_calories)||0, p: Number(data.target_p)||0, f: Number(data.target_f)||0, c: Number(data.target_c)||0 };
+                    
+                    // Завантажуємо збережені за день дані ПЕРЕД тим, як малювати прогрес
+                    loadDailyData();
                     updateProgressUI();
+                    
                     document.getElementById('dashboard').style.display = 'flex';
                     document.getElementById('bottom-nav').style.display = 'flex';
-                    loadDynamicAITips(); 
                 } else { document.getElementById('onboarding').style.display = 'flex'; }
             } catch (error) { document.getElementById('onboarding').style.display = 'flex'; }
         }
         checkUserOnLoad();
 
+        // --- ГЕНЕРАЦІЯ AI ПІДКАЗОК (ТІЛЬКИ ПО КНОПЦІ) ---
         async function loadDynamicAITips() {
-            const container = document.getElementById('ai-content');
+            const container = document.getElementById('ai-text-container');
+            const btn = document.getElementById('ai-gen-btn');
+            
+            btn.innerText = "⏳ Генерую...";
+            btn.disabled = true;
+
             try {
                 const response = await fetch(`${API_URL}/api/get_ai_tips`, { method: "GET", headers: { "ngrok-skip-browser-warning": "true" }});
                 const data = await response.json();
+                
                 if(!data.tip_text) throw new Error("No data");
+                
                 let html = `<div class="ai-text">${data.tip_text}</div>`;
                 if(data.foods) {
                     data.foods.forEach(food => {
@@ -202,11 +268,16 @@
                     });
                 }
                 container.innerHTML = html;
-            } catch (e) { container.innerHTML = '<div class="ai-text">Збалансоване харчування - запорука здоров\'я.</div>'; }
+            } catch (e) { 
+                container.innerHTML = '<div class="ai-text" style="color:red;">Сталася помилка при генерації. Спробуйте ще раз.</div>'; 
+            } finally {
+                btn.innerText = "🔄 Оновити підказку";
+                btn.disabled = false;
+            }
         }
 
         function updateProgressUI() {
-            // Оновлення головної сторінки
+            // Головна
             document.getElementById('cal-target').innerText = targetMacros.cals;
             document.getElementById('cal-consumed').innerText = consumedMacros.cals;
             let calPercent = Math.min((consumedMacros.cals / (targetMacros.cals || 1)) * 100, 100) || 0;
@@ -220,7 +291,7 @@
             document.getElementById('f-bar').style.width = Math.min((consumedMacros.f / (targetMacros.f || 1)) * 100, 100) + '%';
             document.getElementById('c-bar').style.width = Math.min((consumedMacros.c / (targetMacros.c || 1)) * 100, 100) + '%';
 
-            // Оновлення сторінки Статистики (справжні дані замість фейкових)
+            // Статистика
             document.getElementById('stat-p-val').innerText = `${consumedMacros.p}г / ${targetMacros.p*4} ккал`;
             document.getElementById('stat-f-val').innerText = `${consumedMacros.f}г / ${targetMacros.f*9} ккал`;
             document.getElementById('stat-c-val').innerText = `${consumedMacros.c}г / ${targetMacros.c*4} ккал`;
@@ -250,8 +321,7 @@
                 const data = await response.json();
                 
                 if (data.error || data.cals === undefined || isNaN(data.cals)) {
-                    tg.showAlert("ШІ не зміг розпізнати. Спробуйте написати простіше.");
-                    return;
+                    tg.showAlert("ШІ не зміг розпізнати. Спробуйте написати простіше."); return;
                 }
 
                 currentTempMeal = {
@@ -268,16 +338,25 @@
                     </div>
                     <button class="btn btn-primary" style="width:100%; padding:12px;" onclick="confirmAddMeal()">✓ Додати</button>
                 `;
-            } catch (e) { tg.showAlert("Не вдалося підключитися до сервера."); } finally { btn.innerText = "Розрахувати КБЖУ"; btn.disabled = false; }
+            } catch (e) { tg.showAlert("Не вдалося підключитись до сервера."); } finally { btn.innerText = "Розрахувати КБЖУ"; btn.disabled = false; }
         }
 
         function confirmAddMeal() {
+            // Додаємо до поточних макросів
             consumedMacros.cals += currentTempMeal.cals; consumedMacros.p += currentTempMeal.p; consumedMacros.f += currentTempMeal.f; consumedMacros.c += currentTempMeal.c;
+            
+            // Зберігаємо страву в список
+            mealsList.push(currentTempMeal);
+            
+            // Оновлюємо UI та зберігаємо в пам'ять
             updateProgressUI();
+            saveDailyData();
+
             document.getElementById('empty-meals-msg').style.display = 'none';
             const card = document.createElement('div'); card.className = 'food-card';
             card.innerHTML = `<div class="food-header"><span class="food-title">${currentTempMeal.name}</span> <span class="food-weight">${currentTempMeal.weight}г</span></div><div class="food-macros">${currentTempMeal.cals} ккал &nbsp; Б:${currentTempMeal.p}г Ж:${currentTempMeal.f}г В:${currentTempMeal.c}г</div>`;
             document.getElementById('meals-container').appendChild(card);
+            
             closeAddMeal();
         }
 
@@ -285,12 +364,18 @@
             currentWater += amount; 
             document.getElementById('current-water').innerText = currentWater; 
             document.getElementById('water-bar').style.width = Math.min((currentWater / 1500) * 100, 100) + '%'; 
+            
+            // Зберігаємо зміну в пам'ять
+            saveDailyData();
         }
 
         // ВИПРАВЛЕНА НАВІГАЦІЯ
-        function switchMainView(viewName, navItem) { 
+        function switchMainView(viewId, navItem) { 
+            // Ховаємо всі екрани
             document.querySelectorAll('.main-view').forEach(el => el.style.display = 'none'); 
-            document.getElementById(viewName + '-view').style.display = 'flex'; 
+            // Показуємо потрібний екран по його ID
+            document.getElementById(viewId).style.display = 'flex'; 
+            // Змінюємо колір кнопок внизу
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active')); 
             navItem.classList.add('active'); 
             window.scrollTo(0,0); 
@@ -310,10 +395,12 @@
             let tdee = bmr * (userData.activity==='low'?1.2: (userData.activity==='medium'?1.55:1.725));
             if(userData.goal==='lose') tdee-=400; if(userData.goal==='gain') tdee+=400;
             targetMacros.cals = Math.round(tdee); targetMacros.p=Math.round(targetMacros.cals*0.3/4); targetMacros.f=Math.round(targetMacros.cals*0.3/9); targetMacros.c=Math.round(targetMacros.cals*0.4/4);
+            
             updateProgressUI();
+            
             userData.telegram_id = tg.initDataUnsafe?.user?.id || 123456789; userData.macros = targetMacros;
             fetch(`${API_URL}/api/save_user`, {method:"POST", headers:{"Content-Type":"application/json", "ngrok-skip-browser-warning":"true"}, body:JSON.stringify(userData)});
-            document.getElementById('onboarding').style.display='none'; document.getElementById('dashboard').style.display='flex'; document.getElementById('bottom-nav').style.display='flex'; loadDynamicAITips();
+            document.getElementById('onboarding').style.display='none'; document.getElementById('dashboard').style.display='flex'; document.getElementById('bottom-nav').style.display='flex';
         }
     </script>
 </body>
