@@ -122,17 +122,17 @@
                 <h3 style="margin-top:0; font-size:16px; margin-bottom:15px;">AI Фото-аналіз</h3>
                 
                 <div style="display:flex; gap:10px; margin-bottom:15px; text-align:center;">
-                    <label for="camera-input" class="btn btn-secondary" style="flex:1; padding:20px 10px; border:2px dashed var(--border-color); cursor:pointer; background-color:var(--bg-color); display:flex; flex-direction:column; align-items:center;">
+                    <div class="btn btn-secondary" onclick="document.getElementById('camera-input').click()" style="flex:1; padding:20px 10px; border:2px dashed var(--border-color); cursor:pointer; background-color:var(--bg-color); display:flex; flex-direction:column; align-items:center;">
                         <span style="font-size:30px; margin-bottom:5px;">📸</span>
                         <span style="font-size:13px;">Камера</span>
-                    </label>
-                    <input type="file" id="camera-input" accept="image/*" capture="environment" style="display:none;" onchange="previewImage(event)">
+                    </div>
+                    <input type="file" id="camera-input" accept="image/*" capture="environment" style="opacity: 0; position: absolute; z-index: -1; width: 0; height: 0;" onchange="previewImage(event)">
                     
-                    <label for="gallery-input" class="btn btn-secondary" style="flex:1; padding:20px 10px; border:2px dashed var(--border-color); cursor:pointer; background-color:var(--bg-color); display:flex; flex-direction:column; align-items:center;">
+                    <div class="btn btn-secondary" onclick="document.getElementById('gallery-input').click()" style="flex:1; padding:20px 10px; border:2px dashed var(--border-color); cursor:pointer; background-color:var(--bg-color); display:flex; flex-direction:column; align-items:center;">
                         <span style="font-size:30px; margin-bottom:5px;">🖼</span>
                         <span style="font-size:13px;">Галерея</span>
-                    </label>
-                    <input type="file" id="gallery-input" accept="image/*" style="display:none;" onchange="previewImage(event)">
+                    </div>
+                    <input type="file" id="gallery-input" accept="image/*" style="opacity: 0; position: absolute; z-index: -1; width: 0; height: 0;" onchange="previewImage(event)">
                 </div>
 
                 <img id="image-preview" style="max-width:100%; border-radius:12px; display:none; margin-bottom:15px; border:1px solid var(--border-color);">
@@ -416,3 +416,4 @@
     </script>
 </body>
 </html>
+
