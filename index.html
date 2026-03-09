@@ -115,18 +115,28 @@
 
     <div id="add-meal-view" class="main-view">
         <div class="view-header" style="display:flex; align-items:center; gap:15px; margin-bottom:20px; font-weight:bold;"><button class="back-btn" onclick="closeAddMeal()">←</button>Додати страву</div>
-        <div class="tabs-container"><button class="tab-btn" onclick="switchTab('photo', this)">📷 Фото</button><button class="tab-btn active" onclick="switchTab('input', this)">✎ Ввід</button></div>
+        <div class="tabs-container"><button class="tab-btn active" onclick="switchTab('photo', this)">📷 Фото</button><button class="tab-btn" onclick="switchTab('input', this)">✎ Ввід</button></div>
         
-        <div id="tab-photo" style="display:none;">
-            <div class="dash-card" style="text-align:center; padding:30px;">
-                <div style="font-size:40px; margin-bottom:15px;">📸</div>
-                <div style="color:var(--text-muted); margin-bottom:20px; font-size:14px;">Функція розпізнавання їжі по фото буде додана наступним кроком!</div>
+        <div id="tab-photo" style="display:block;">
+            <div class="dash-card">
+                <h3 style="margin-top:0; font-size:16px;">AI Фото-аналіз</h3>
+                <div style="text-align:center; margin-bottom:15px;">
+                    <label for="food-image-input" class="btn btn-secondary" style="display:block; padding:30px 20px; border:2px dashed var(--border-color); cursor:pointer; background-color:var(--bg-color);">
+                        <span style="font-size:40px; display:block; margin-bottom:10px;">📸</span>
+                        Зробити фото або обрати з галереї
+                    </label>
+                    <input type="file" id="food-image-input" accept="image/*" style="display:none;" onchange="previewImage(event)">
+                </div>
+                <img id="image-preview" style="max-width:100%; border-radius:12px; display:none; margin-bottom:15px; border:1px solid var(--border-color);">
+                
+                <button class="btn btn-primary" style="width:100%; display:none;" id="calc-photo-btn" onclick="calculateAIPhoto()">Аналізувати фото ✨</button>
             </div>
+            <div id="ai-photo-result-card" style="display:none; margin-top:15px; padding:15px; background-color:var(--card-bg); border-radius:16px;"></div>
         </div>
 
-        <div id="tab-input" style="display:block;">
+        <div id="tab-input" style="display:none;">
             <div class="dash-card">
-                <h3 style="margin-top:0; font-size:16px;">AI розрахунок</h3>
+                <h3 style="margin-top:0; font-size:16px;">AI розрахунок тексту</h3>
                 <div class="input-group"><label>Назва *</label><input type="text" id="food-name-input" placeholder="Наприклад: Кава з молоком"></div>
                 <div class="input-group"><label>Вага порції</label><div style="display:flex; gap:10px;"><input type="number" id="food-weight-input" placeholder="250" style="flex:1;"><span>г/мл</span></div></div>
                 <button class="btn btn-primary" style="width:100%;" id="calc-btn" onclick="calculateAI()">Розрахувати КБЖУ</button>
@@ -173,41 +183,31 @@
         
         let historyData = {}; 
         const todayDate = new Date().toISOString().split('T')[0];
-        
-        // Змінні для відстеження активних дат
         let statSelectedDate = todayDate; 
         let dashboardSelectedDate = todayDate;
 
         // ⚠️⚠️⚠️ ВСТАВ СЮДИ СВІЙ NGROK URL ⚠️⚠️⚠️
         const API_URL = "https://kirby-hypoxanthic-milagro.ngrok-free.dev"; 
+        
+        // Змінна для зберігання картинки у Base64
+        let currentBase64Image = null;
 
         function loadHistory() {
             const saved = localStorage.getItem('foodAppHistoryV3');
             if(saved) historyData = JSON.parse(saved);
-            
-            if(!historyData[todayDate]) {
-                historyData[todayDate] = { cals: 0, p: 0, f: 0, c: 0, water: 0, mealsList: [] };
-            }
-            if (historyData[todayDate].water === undefined || isNaN(historyData[todayDate].water)) {
-                historyData[todayDate].water = 0;
-            }
+            if(!historyData[todayDate]) { historyData[todayDate] = { cals: 0, p: 0, f: 0, c: 0, water: 0, mealsList: [] }; }
+            if (historyData[todayDate].water === undefined || isNaN(historyData[todayDate].water)) { historyData[todayDate].water = 0; }
         }
 
         function saveHistory() { localStorage.setItem('foodAppHistoryV3', JSON.stringify(historyData)); }
-
         function getDayData(dateString) { return historyData[dateString] || { cals: 0, p: 0, f: 0, c: 0, water: 0, mealsList: [] }; }
 
         function showScreen(screenId) {
-            document.getElementById('dashboard').style.display = 'none';
-            document.getElementById('statistics-view').style.display = 'none';
-            document.getElementById('add-meal-view').style.display = 'none';
-            document.getElementById('onboarding').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'none'; document.getElementById('statistics-view').style.display = 'none';
+            document.getElementById('add-meal-view').style.display = 'none'; document.getElementById('onboarding').style.display = 'none';
             document.getElementById('bottom-nav').style.display = 'none';
-            
             document.getElementById(screenId).style.display = 'flex';
-            if (screenId === 'dashboard' || screenId === 'statistics-view') {
-                document.getElementById('bottom-nav').style.display = 'flex';
-            }
+            if (screenId === 'dashboard' || screenId === 'statistics-view') { document.getElementById('bottom-nav').style.display = 'flex'; }
         }
 
         async function checkUserOnLoad() {
@@ -215,7 +215,6 @@
             try {
                 const response = await fetch(`${API_URL}/api/get_user?telegram_id=${tg_id}`, { method: "GET", headers: { "ngrok-skip-browser-warning": "true" }});
                 if (!response.ok) throw new Error("Сервер недоступний");
-                
                 const data = await response.json();
                 if (data.exists) {
                     targetMacros = { cals: Number(data.target_calories)||0, p: Number(data.target_p)||0, f: Number(data.target_f)||0, c: Number(data.target_c)||0 };
@@ -223,8 +222,7 @@
                     showScreen('dashboard');
                 } else { showScreen('onboarding'); }
             } catch (error) { 
-                showScreen('onboarding');
-                tg.showAlert("⚠️ Немає зв'язку з бекендом. Переконайся, що Ngrok запущено і URL вказано вірно.");
+                showScreen('onboarding'); tg.showAlert("⚠️ Немає зв'язку з бекендом. Переконайся, що Ngrok запущено і URL вказано вірно.");
             }
         }
         checkUserOnLoad();
@@ -248,46 +246,26 @@
             } finally { btn.innerText = "🔄 Оновити підказку"; btn.disabled = false; }
         }
 
-        // --- ЛОГІКА ГОРТАННЯ ДНІВ НА ГОЛОВНІЙ ---
         function changeDashDate(offset) {
-            let d = new Date(dashboardSelectedDate);
-            d.setDate(d.getDate() + offset);
+            let d = new Date(dashboardSelectedDate); d.setDate(d.getDate() + offset);
             let newDateStr = d.toISOString().split('T')[0];
-            
-            // Рахуємо різницю в днях між "Сьогодні" та новою датою
-            let todayObj = new Date(todayDate);
-            let diffDays = Math.round((todayObj - d) / 86400000);
-            
-            if (diffDays < 0) return; // Не пускаємо в майбутнє
-            if (diffDays > 3) return; // Не пускаємо далі 3 днів назад
-            
-            dashboardSelectedDate = newDateStr;
-            updateDashboardUI();
+            let todayObj = new Date(todayDate); let diffDays = Math.round((todayObj - d) / 86400000);
+            if (diffDays < 0 || diffDays > 3) return; 
+            dashboardSelectedDate = newDateStr; updateDashboardUI();
         }
 
         function updateDashboardUI() {
-            // Оновлюємо текст і стрілочки в шапці
-            let todayObj = new Date(todayDate);
-            let d = new Date(dashboardSelectedDate);
-            let diffDays = Math.round((todayObj - d) / 86400000);
-            
-            let title = "Сьогодні";
-            if (diffDays === 1) title = "Вчора";
-            else if (diffDays > 1) title = dashboardSelectedDate.split('-').reverse().join('.');
-            
+            let todayObj = new Date(todayDate); let d = new Date(dashboardSelectedDate); let diffDays = Math.round((todayObj - d) / 86400000);
+            let title = "Сьогодні"; if (diffDays === 1) title = "Вчора"; else if (diffDays > 1) title = dashboardSelectedDate.split('-').reverse().join('.');
             document.getElementById('dash-date-title').innerText = title;
-            document.getElementById('dash-prev-btn').style.opacity = diffDays >= 3 ? "0.3" : "1";
-            document.getElementById('dash-next-btn').style.opacity = diffDays <= 0 ? "0.3" : "1";
+            document.getElementById('dash-prev-btn').style.opacity = diffDays >= 3 ? "0.3" : "1"; document.getElementById('dash-next-btn').style.opacity = diffDays <= 0 ? "0.3" : "1";
 
-            // Оновлюємо дані на екрані
             const data = getDayData(dashboardSelectedDate);
             document.getElementById('cal-target').innerText = targetMacros.cals; document.getElementById('cal-consumed').innerText = data.cals;
             let calPercent = Math.min((data.cals / (targetMacros.cals || 1)) * 100, 100) || 0;
             document.getElementById('cal-circle').style.background = `conic-gradient(var(--primary-color) ${calPercent}%, var(--border-color) 0)`;
-            
             document.getElementById('p-text').innerText = `${data.p}/${targetMacros.p} г`; document.getElementById('f-text').innerText = `${data.f}/${targetMacros.f} г`; document.getElementById('c-text').innerText = `${data.c}/${targetMacros.c} г`;
             document.getElementById('p-bar').style.width = Math.min((data.p / (targetMacros.p || 1)) * 100, 100) + '%'; document.getElementById('f-bar').style.width = Math.min((data.f / (targetMacros.f || 1)) * 100, 100) + '%'; document.getElementById('c-bar').style.width = Math.min((data.c / (targetMacros.c || 1)) * 100, 100) + '%';
-
             document.getElementById('current-water').innerText = data.water; document.getElementById('water-bar').style.width = Math.min((data.water / 1500) * 100, 100) + '%';
 
             const container = document.getElementById('meals-container');
@@ -302,16 +280,10 @@
         }
 
         function updateStatUI(dateString) {
-            statSelectedDate = dateString;
-            const data = getDayData(dateString);
-
-            if(dateString === todayDate) { document.getElementById('stat-date-title').innerText = "Сьогодні"; }
-            else { document.getElementById('stat-date-title').innerText = dateString.split('-').reverse().join('.'); }
-
+            statSelectedDate = dateString; const data = getDayData(dateString);
+            if(dateString === todayDate) { document.getElementById('stat-date-title').innerText = "Сьогодні"; } else { document.getElementById('stat-date-title').innerText = dateString.split('-').reverse().join('.'); }
             document.getElementById('stat-p-val').innerText = `${data.p}г / ${targetMacros.p*4} ккал`; document.getElementById('stat-f-val').innerText = `${data.f}г / ${targetMacros.f*9} ккал`; document.getElementById('stat-c-val').innerText = `${data.c}г / ${targetMacros.c*4} ккал`;
-            
             let pPerc = targetMacros.p ? Math.round((data.p / targetMacros.p) * 100) : 0; let fPerc = targetMacros.f ? Math.round((data.f / targetMacros.f) * 100) : 0; let cPerc = targetMacros.c ? Math.round((data.c / targetMacros.c) * 100) : 0;
-            
             document.getElementById('stat-p-percent').innerText = `${Math.min(pPerc, 100)}%`; document.getElementById('stat-f-percent').innerText = `${Math.min(fPerc, 100)}%`; document.getElementById('stat-c-percent').innerText = `${Math.min(cPerc, 100)}%`;
             document.getElementById('stat-p-bar').style.width = `${Math.min(pPerc, 100)}%`; document.getElementById('stat-f-bar').style.width = `${Math.min(fPerc, 100)}%`; document.getElementById('stat-c-bar').style.width = `${Math.min(cPerc, 100)}%`;
             generateCalendar(); 
@@ -321,22 +293,79 @@
             const calContainer = document.getElementById('stat-calendar'); calContainer.innerHTML = '';
             const daysNames = ['Нд', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
             let labelsHtml = '';
-            for(let i = 6; i >= 0; i--) {
-                let d = new Date(); d.setDate(d.getDate() - i);
-                labelsHtml += `<div class="cal-day-label">${daysNames[d.getDay()]}</div>`;
-            }
+            for(let i = 6; i >= 0; i--) { let d = new Date(); d.setDate(d.getDate() - i); labelsHtml += `<div class="cal-day-label">${daysNames[d.getDay()]}</div>`; }
             calContainer.innerHTML = labelsHtml;
             for(let i = 6; i >= 0; i--) {
-                let d = new Date(); d.setDate(d.getDate() - i);
-                let dateStr = d.toISOString().split('T')[0];
+                let d = new Date(); d.setDate(d.getDate() - i); let dateStr = d.toISOString().split('T')[0];
                 let div = document.createElement('div'); div.className = 'cal-date'; div.innerText = d.getDate();
                 if(dateStr === statSelectedDate) div.classList.add('active');
                 if(historyData[dateStr] && (historyData[dateStr].cals > 0 || historyData[dateStr].water > 0)) { div.classList.add('has-data'); }
-                div.onclick = () => updateStatUI(dateStr);
-                calContainer.appendChild(div);
+                div.onclick = () => updateStatUI(dateStr); calContainer.appendChild(div);
             }
         }
 
+        // --- ЛОГІКА РОБОТИ З ФОТО ---
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                currentBase64Image = e.target.result;
+                const preview = document.getElementById('image-preview');
+                preview.src = currentBase64Image;
+                preview.style.display = 'block';
+                document.getElementById('calc-photo-btn').style.display = 'block';
+                document.getElementById('ai-photo-result-card').style.display = 'none';
+            }
+            reader.readAsDataURL(file);
+        }
+
+        async function calculateAIPhoto() {
+            if (!currentBase64Image) return;
+            const btn = document.getElementById('calc-photo-btn');
+            const result = document.getElementById('ai-photo-result-card');
+            
+            btn.innerText = "⏳ ШІ дивиться на фото..."; btn.disabled = true;
+            try {
+                const response = await fetch(`${API_URL}/api/calculate_photo`, { 
+                    method: "POST", 
+                    headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" }, 
+                    body: JSON.stringify({ image: currentBase64Image }) 
+                });
+                
+                const data = await response.json();
+                
+                if (data.error === "not_food") {
+                    tg.showAlert("ШІ каже, що на фото немає їжі! 😅 Спробуй інше фото.");
+                    return;
+                }
+                if (data.error) throw new Error(data.error);
+
+                const cals = Number(data.cals || data.Cals || data.calories) || 0; 
+                const p = Number(data.p || data.P || data.protein) || 0; 
+                const f = Number(data.f || data.F || data.fat) || 0; 
+                const c = Number(data.c || data.C || data.carbs) || 0;
+                
+                currentTempMeal = { name: data.name || "Страва з фото", weight: data.weight || 100, cals, p, f, c };
+                
+                result.style.display = 'block';
+                result.innerHTML = `
+                    <div style="font-weight:bold; margin-bottom:10px;">✨ Розпізнано: ${currentTempMeal.name} (${currentTempMeal.weight}г)</div>
+                    <div style="font-size:18px; color:var(--primary-color); font-weight:bold; margin-bottom:15px;">${currentTempMeal.cals} ккал</div>
+                    <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
+                        <span style="color:var(--purple-macros);">Б: ${currentTempMeal.p}г</span><span style="color:var(--orange-macros);">Ж: ${currentTempMeal.f}г</span><span style="color:var(--blue-macros);">В: ${currentTempMeal.c}г</span>
+                    </div>
+                    <button class="btn btn-primary" style="width:100%; padding:12px;" onclick="confirmAddMeal()">✓ Додати</button>
+                `;
+            } catch (e) { 
+                tg.showAlert("Помилка розпізнавання. Можливо, фото завелике."); 
+            } finally { 
+                btn.innerText = "Аналізувати фото ✨"; btn.disabled = false; 
+            }
+        }
+
+        // Старий текстовий промпт
         async function calculateAI() {
             const name = document.getElementById('food-name-input').value; const weight = document.getElementById('food-weight-input').value;
             if (!name) { tg.showAlert("Введіть назву!"); return; }
@@ -346,7 +375,6 @@
                 const query = weight ? `${name} ${weight}г` : name;
                 const response = await fetch(`${API_URL}/api/calculate_food`, { method: "POST", headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" }, body: JSON.stringify({ query }) });
                 const data = await response.json();
-                
                 const cals = Number(data.cals || data.Cals || data.calories) || 0; const p = Number(data.p || data.P || data.protein) || 0; const f = Number(data.f || data.F || data.fat) || 0; const c = Number(data.c || data.C || data.carbs) || 0;
                 if (data.error || isNaN(cals) || cals === 0) { tg.showAlert("ШІ не зміг розпізнати. Спробуйте написати простіше."); return; }
                 currentTempMeal = { name: data.name || data.Name || name, weight: data.weight || data.Weight || weight || 100, cals, p, f, c };
@@ -357,32 +385,29 @@
 
         function confirmAddMeal() {
             if(!historyData[dashboardSelectedDate]) { historyData[dashboardSelectedDate] = { cals: 0, p: 0, f: 0, c: 0, water: 0, mealsList: [] }; }
-            historyData[dashboardSelectedDate].cals += currentTempMeal.cals; 
-            historyData[dashboardSelectedDate].p += currentTempMeal.p; 
-            historyData[dashboardSelectedDate].f += currentTempMeal.f; 
-            historyData[dashboardSelectedDate].c += currentTempMeal.c;
+            historyData[dashboardSelectedDate].cals += currentTempMeal.cals; historyData[dashboardSelectedDate].p += currentTempMeal.p; historyData[dashboardSelectedDate].f += currentTempMeal.f; historyData[dashboardSelectedDate].c += currentTempMeal.c;
             historyData[dashboardSelectedDate].mealsList.push(currentTempMeal);
             saveHistory(); updateDashboardUI(); if(statSelectedDate === dashboardSelectedDate) updateStatUI(dashboardSelectedDate);
             closeAddMeal();
+            
+            // Очищення полів після додавання
+            document.getElementById('food-name-input').value = ""; document.getElementById('food-weight-input').value = "";
+            document.getElementById('image-preview').style.display = 'none'; document.getElementById('calc-photo-btn').style.display = 'none'; currentBase64Image = null;
         }
 
         function addWater(amount) { 
             if(!historyData[dashboardSelectedDate]) { historyData[dashboardSelectedDate] = { cals: 0, p: 0, f: 0, c: 0, water: 0, mealsList: [] }; }
-            historyData[dashboardSelectedDate].water += amount; 
-            saveHistory(); updateDashboardUI(); if(statSelectedDate === dashboardSelectedDate) updateStatUI(dashboardSelectedDate);
+            historyData[dashboardSelectedDate].water += amount; saveHistory(); updateDashboardUI(); if(statSelectedDate === dashboardSelectedDate) updateStatUI(dashboardSelectedDate);
         }
 
         function switchMainView(viewId, navItem) { 
-            showScreen(viewId);
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active')); 
-            navItem.classList.add('active'); window.scrollTo(0,0); 
-            if(viewId === 'statistics-view') updateStatUI(todayDate); 
-            if(viewId === 'dashboard') { dashboardSelectedDate = todayDate; updateDashboardUI(); }
+            showScreen(viewId); document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active')); navItem.classList.add('active'); window.scrollTo(0,0); 
+            if(viewId === 'statistics-view') updateStatUI(todayDate); if(viewId === 'dashboard') { dashboardSelectedDate = todayDate; updateDashboardUI(); }
         }
 
         function toggleAI() { const c = document.getElementById('ai-content'); const a = document.getElementById('ai-arrow'); if(c.style.display==='none'){c.style.display='block'; a.innerText='^';}else{c.style.display='none'; a.innerText='v';} }
         function openAddMeal() { showScreen('add-meal-view'); }
-        function closeAddMeal() { showScreen('dashboard'); document.getElementById('ai-result-card').style.display='none'; }
+        function closeAddMeal() { showScreen('dashboard'); document.getElementById('ai-result-card').style.display='none'; document.getElementById('ai-photo-result-card').style.display='none'; }
         function switchTab(t,b){ document.getElementById('tab-photo').style.display=t==='photo'?'block':'none'; document.getElementById('tab-input').style.display=t==='input'?'block':'none'; document.querySelectorAll('.tab-btn').forEach(e=>e.classList.remove('active')); b.classList.add('active'); }
         function nextStep(s){ document.querySelectorAll('.step').forEach(e=>e.classList.remove('active')); document.getElementById('step'+s).classList.add('active'); }
         function selectOption(c,v,e){ userData[c]=v; e.parentElement.querySelectorAll('.option-card').forEach(x=>x.classList.remove('selected')); e.classList.add('selected'); }
@@ -390,26 +415,14 @@
         async function finishOnboarding() {
             userData.age = parseInt(document.getElementById('age').value); userData.height = parseInt(document.getElementById('height').value); userData.weight = parseInt(document.getElementById('weight').value);
             if(!userData.gender || !userData.age || !userData.height || !userData.weight || !userData.goal || !userData.activity){ tg.showAlert("Заповніть поля!"); return; }
-            
-            const btn = document.getElementById('finish-btn');
-            btn.innerText = "⏳ Зберігаємо..."; btn.disabled = true;
-
-            let bmr = (10*userData.weight)+(6.25*userData.height)-(5*userData.age)+(userData.gender==='male'?5:-161);
-            let tdee = bmr * (userData.activity==='low'?1.2: (userData.activity==='medium'?1.55:1.725));
+            const btn = document.getElementById('finish-btn'); btn.innerText = "⏳ Зберігаємо..."; btn.disabled = true;
+            let bmr = (10*userData.weight)+(6.25*userData.height)-(5*userData.age)+(userData.gender==='male'?5:-161); let tdee = bmr * (userData.activity==='low'?1.2: (userData.activity==='medium'?1.55:1.725));
             if(userData.goal==='lose') tdee-=400; if(userData.goal==='gain') tdee+=400;
             targetMacros.cals = Math.round(tdee); targetMacros.p=Math.round(targetMacros.cals*0.3/4); targetMacros.f=Math.round(targetMacros.cals*0.3/9); targetMacros.c=Math.round(targetMacros.cals*0.4/4);
-            
             userData.telegram_id = tg.initDataUnsafe?.user?.id || 123456789; userData.macros = targetMacros;
-            
-            try {
-                await fetch(`${API_URL}/api/save_user`, {method:"POST", headers:{"Content-Type":"application/json", "ngrok-skip-browser-warning":"true"}, body:JSON.stringify(userData)});
-                await checkUserOnLoad(); 
-            } catch(e) {
-                tg.showAlert("⚠️ Помилка з'єднання! Перевір посилання Ngrok.");
-                btn.innerText = "Почати!"; btn.disabled = false;
-            }
+            try { await fetch(`${API_URL}/api/save_user`, {method:"POST", headers:{"Content-Type":"application/json", "ngrok-skip-browser-warning":"true"}, body:JSON.stringify(userData)}); await checkUserOnLoad(); 
+            } catch(e) { tg.showAlert("⚠️ Помилка з'єднання! Перевір посилання Ngrok."); btn.innerText = "Почати!"; btn.disabled = false; }
         }
     </script>
 </body>
 </html>
-
