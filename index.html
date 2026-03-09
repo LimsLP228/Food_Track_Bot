@@ -119,14 +119,22 @@
         
         <div id="tab-photo" style="display:block;">
             <div class="dash-card">
-                <h3 style="margin-top:0; font-size:16px;">AI Фото-аналіз</h3>
-                <div style="text-align:center; margin-bottom:15px;">
-                    <label for="food-image-input" class="btn btn-secondary" style="display:block; padding:30px 20px; border:2px dashed var(--border-color); cursor:pointer; background-color:var(--bg-color);">
-                        <span style="font-size:40px; display:block; margin-bottom:10px;">📸</span>
-                        Зробити фото або обрати з галереї
+                <h3 style="margin-top:0; font-size:16px; margin-bottom:15px;">AI Фото-аналіз</h3>
+                
+                <div style="display:flex; gap:10px; margin-bottom:15px; text-align:center;">
+                    <label for="camera-input" class="btn btn-secondary" style="flex:1; padding:20px 10px; border:2px dashed var(--border-color); cursor:pointer; background-color:var(--bg-color); display:flex; flex-direction:column; align-items:center;">
+                        <span style="font-size:30px; margin-bottom:5px;">📸</span>
+                        <span style="font-size:13px;">Камера</span>
                     </label>
-                    <input type="file" id="food-image-input" accept="image/*" style="display:none;" onchange="previewImage(event)">
+                    <input type="file" id="camera-input" accept="image/*" capture="environment" style="display:none;" onchange="previewImage(event)">
+                    
+                    <label for="gallery-input" class="btn btn-secondary" style="flex:1; padding:20px 10px; border:2px dashed var(--border-color); cursor:pointer; background-color:var(--bg-color); display:flex; flex-direction:column; align-items:center;">
+                        <span style="font-size:30px; margin-bottom:5px;">🖼</span>
+                        <span style="font-size:13px;">Галерея</span>
+                    </label>
+                    <input type="file" id="gallery-input" accept="image/*" style="display:none;" onchange="previewImage(event)">
                 </div>
+
                 <img id="image-preview" style="max-width:100%; border-radius:12px; display:none; margin-bottom:15px; border:1px solid var(--border-color);">
                 
                 <button class="btn btn-primary" style="width:100%; display:none;" id="calc-photo-btn" onclick="calculateAIPhoto()">Аналізувати фото ✨</button>
@@ -365,7 +373,6 @@
             }
         }
 
-        // Старий текстовий промпт
         async function calculateAI() {
             const name = document.getElementById('food-name-input').value; const weight = document.getElementById('food-weight-input').value;
             if (!name) { tg.showAlert("Введіть назву!"); return; }
@@ -393,6 +400,7 @@
             // Очищення полів після додавання
             document.getElementById('food-name-input').value = ""; document.getElementById('food-weight-input').value = "";
             document.getElementById('image-preview').style.display = 'none'; document.getElementById('calc-photo-btn').style.display = 'none'; currentBase64Image = null;
+            document.getElementById('camera-input').value = ""; document.getElementById('gallery-input').value = "";
         }
 
         function addWater(amount) { 
