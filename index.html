@@ -188,7 +188,6 @@
         let userData = { gender: null, age: null, height: null, weight: null, goal: null, activity: null };
         let targetMacros = { cals: 0, p: 0, f: 0, c: 0 };
         let currentTempMeal = {};
-        
         let historyData = {}; 
         const todayDate = new Date().toISOString().split('T')[0];
         let statSelectedDate = todayDate; 
@@ -197,7 +196,6 @@
         // ⚠️⚠️⚠️ ВСТАВ СЮДИ СВІЙ NGROK URL ⚠️⚠️⚠️
         const API_URL = "https://kirby-hypoxanthic-milagro.ngrok-free.dev"; 
         
-        // Змінна для зберігання картинки у Base64
         let currentBase64Image = null;
 
         function loadHistory() {
@@ -230,30 +228,81 @@
                     showScreen('dashboard');
                 } else { showScreen('onboarding'); }
             } catch (error) { 
-                showScreen('onboarding'); tg.showAlert("⚠️ Немає зв'язку з бекендом. Переконайся, що Ngrok запущено і URL вказано вірно.");
+                showScreen('onboarding'); tg.showAlert("⚠️ Немає зв'язку з бекендом. Переконайся, що Ngrok запущено.");
             }
         }
         checkUserOnLoad();
 
-        async function loadDynamicAITips() {
-            const container = document.getElementById('ai-text-container'); const btn = document.getElementById('ai-gen-btn');
-            btn.innerText = "⏳ Генерую..."; btn.disabled = true;
-            try {
-                const response = await fetch(`${API_URL}/api/get_ai_tips`, { method: "GET", headers: { "ngrok-skip-browser-warning": "true" }});
-                const data = await response.json();
-                if(!data.tip_text) throw new Error("No data");
-                let html = `<div class="ai-text">${data.tip_text}</div>`;
-                if(data.foods) {
-                    data.foods.forEach(f => {
-                        const cals = f.cals || f.Cals || f.calories || 0; const p = f.p || f.P || 0; const fat = f.f || f.F || 0; const c = f.c || f.C || 0;
-                        html += `<div class="food-card"><div class="food-header"><span class="food-title">${f.name||'Страва'}</span> <span class="food-weight">${f.weight||'100г'}</span></div><div class="food-macros">${cals} ккал &nbsp; <span style="color:var(--purple-macros);">Б:${p}г</span> &nbsp; <span style="color:var(--orange-macros);">Ж:${fat}г</span> &nbsp; <span style="color:var(--blue-macros);">В:${c}г</span></div><div class="food-desc">${f.desc || ''}</div></div>`;
-                    });
+        // --- ЛОГІКА РОБОТИ З ФОТО (ВИПРАВЛЕНО) ---
+        
+        // Функція для стиснення картинки (ШІ не потрібні великі файли, це пришвидшить роботу)
+        function processImage(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    const max_size = 800; // Стискаємо до 800px
+
+                    if (width > height) {
+                        if (width > max_size) { height *= max_size / width; width = max_size; }
+                    } else {
+                        if (height > max_size) { width *= max_size / height; height = max_size; }
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    currentBase64Image = canvas.toDataURL('image/jpeg', 0.7);
+                    const preview = document.getElementById('image-preview');
+                    preview.src = currentBase64Image;
+                    preview.style.display = 'block';
+                    document.getElementById('calc-photo-btn').style.display = 'block';
+                    document.getElementById('ai-photo-result-card').style.display = 'none';
                 }
-                container.innerHTML = html;
-            } catch (e) { container.innerHTML = '<div class="ai-text" style="color:red;">Сталася помилка. Спробуйте ще раз.</div>'; 
-            } finally { btn.innerText = "🔄 Оновити підказку"; btn.disabled = false; }
+                img.src = e.target.result;
+            }
+            reader.readAsDataURL(file);
         }
 
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (file) processImage(file);
+        }
+
+        async function calculateAIPhoto() {
+            if (!currentBase64Image) return;
+            const btn = document.getElementById('calc-photo-btn');
+            const result = document.getElementById('ai-photo-result-card');
+            btn.innerText = "⏳ ШІ аналізує фото..."; btn.disabled = true;
+            try {
+                const response = await fetch(`${API_URL}/api/calculate_photo`, { 
+                    method: "POST", 
+                    headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" }, 
+                    body: JSON.stringify({ image: currentBase64Image }) 
+                });
+                const data = await response.json();
+                if (data.error === "not_food") { tg.showAlert("ШІ не бачить їжі на фото! 🍕"); return; }
+                
+                currentTempMeal = { 
+                    name: data.name || "Страва з фото", 
+                    weight: data.weight || 100, 
+                    cals: Number(data.cals)||0, p: Number(data.p)||0, f: Number(data.f)||0, c: Number(data.c)||0 
+                };
+                
+                result.style.display = 'block';
+                result.innerHTML = `
+                    <div style="font-weight:bold; margin-bottom:10px;">✨ ${currentTempMeal.name} (${currentTempMeal.weight}г)</div>
+                    <div style="font-size:18px; color:var(--primary-color); font-weight:bold; margin-bottom:15px;">${currentTempMeal.cals} ккал</div>
+                    <button class="btn btn-primary" style="width:100%; padding:12px;" onclick="confirmAddMeal()">✓ Додати</button>
+                `;
+            } catch (e) { tg.showAlert("Помилка сервера. Перевір Ngrok."); } finally { btn.innerText = "Аналізувати фото ✨"; btn.disabled = false; }
+        }
+
+        // --- РЕШТА ФУНКЦІЙ (БЕЗ ЗМІН) ---
         function changeDashDate(offset) {
             let d = new Date(dashboardSelectedDate); d.setDate(d.getDate() + offset);
             let newDateStr = d.toISOString().split('T')[0];
@@ -267,7 +316,6 @@
             let title = "Сьогодні"; if (diffDays === 1) title = "Вчора"; else if (diffDays > 1) title = dashboardSelectedDate.split('-').reverse().join('.');
             document.getElementById('dash-date-title').innerText = title;
             document.getElementById('dash-prev-btn').style.opacity = diffDays >= 3 ? "0.3" : "1"; document.getElementById('dash-next-btn').style.opacity = diffDays <= 0 ? "0.3" : "1";
-
             const data = getDayData(dashboardSelectedDate);
             document.getElementById('cal-target').innerText = targetMacros.cals; document.getElementById('cal-consumed').innerText = data.cals;
             let calPercent = Math.min((data.cals / (targetMacros.cals || 1)) * 100, 100) || 0;
@@ -275,7 +323,6 @@
             document.getElementById('p-text').innerText = `${data.p}/${targetMacros.p} г`; document.getElementById('f-text').innerText = `${data.f}/${targetMacros.f} г`; document.getElementById('c-text').innerText = `${data.c}/${targetMacros.c} г`;
             document.getElementById('p-bar').style.width = Math.min((data.p / (targetMacros.p || 1)) * 100, 100) + '%'; document.getElementById('f-bar').style.width = Math.min((data.f / (targetMacros.f || 1)) * 100, 100) + '%'; document.getElementById('c-bar').style.width = Math.min((data.c / (targetMacros.c || 1)) * 100, 100) + '%';
             document.getElementById('current-water').innerText = data.water; document.getElementById('water-bar').style.width = Math.min((data.water / 1500) * 100, 100) + '%';
-
             const container = document.getElementById('meals-container');
             if (data.mealsList.length > 0) {
                 container.innerHTML = '';
@@ -312,67 +359,6 @@
             }
         }
 
-        // --- ЛОГІКА РОБОТИ З ФОТО ---
-        function previewImage(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                currentBase64Image = e.target.result;
-                const preview = document.getElementById('image-preview');
-                preview.src = currentBase64Image;
-                preview.style.display = 'block';
-                document.getElementById('calc-photo-btn').style.display = 'block';
-                document.getElementById('ai-photo-result-card').style.display = 'none';
-            }
-            reader.readAsDataURL(file);
-        }
-
-        async function calculateAIPhoto() {
-            if (!currentBase64Image) return;
-            const btn = document.getElementById('calc-photo-btn');
-            const result = document.getElementById('ai-photo-result-card');
-            
-            btn.innerText = "⏳ ШІ дивиться на фото..."; btn.disabled = true;
-            try {
-                const response = await fetch(`${API_URL}/api/calculate_photo`, { 
-                    method: "POST", 
-                    headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" }, 
-                    body: JSON.stringify({ image: currentBase64Image }) 
-                });
-                
-                const data = await response.json();
-                
-                if (data.error === "not_food") {
-                    tg.showAlert("ШІ каже, що на фото немає їжі! 😅 Спробуй інше фото.");
-                    return;
-                }
-                if (data.error) throw new Error(data.error);
-
-                const cals = Number(data.cals || data.Cals || data.calories) || 0; 
-                const p = Number(data.p || data.P || data.protein) || 0; 
-                const f = Number(data.f || data.F || data.fat) || 0; 
-                const c = Number(data.c || data.C || data.carbs) || 0;
-                
-                currentTempMeal = { name: data.name || "Страва з фото", weight: data.weight || 100, cals, p, f, c };
-                
-                result.style.display = 'block';
-                result.innerHTML = `
-                    <div style="font-weight:bold; margin-bottom:10px;">✨ Розпізнано: ${currentTempMeal.name} (${currentTempMeal.weight}г)</div>
-                    <div style="font-size:18px; color:var(--primary-color); font-weight:bold; margin-bottom:15px;">${currentTempMeal.cals} ккал</div>
-                    <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
-                        <span style="color:var(--purple-macros);">Б: ${currentTempMeal.p}г</span><span style="color:var(--orange-macros);">Ж: ${currentTempMeal.f}г</span><span style="color:var(--blue-macros);">В: ${currentTempMeal.c}г</span>
-                    </div>
-                    <button class="btn btn-primary" style="width:100%; padding:12px;" onclick="confirmAddMeal()">✓ Додати</button>
-                `;
-            } catch (e) { 
-                tg.showAlert("Помилка розпізнавання. Можливо, фото завелике."); 
-            } finally { 
-                btn.innerText = "Аналізувати фото ✨"; btn.disabled = false; 
-            }
-        }
-
         async function calculateAI() {
             const name = document.getElementById('food-name-input').value; const weight = document.getElementById('food-weight-input').value;
             if (!name) { tg.showAlert("Введіть назву!"); return; }
@@ -383,10 +369,10 @@
                 const response = await fetch(`${API_URL}/api/calculate_food`, { method: "POST", headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" }, body: JSON.stringify({ query }) });
                 const data = await response.json();
                 const cals = Number(data.cals || data.Cals || data.calories) || 0; const p = Number(data.p || data.P || data.protein) || 0; const f = Number(data.f || data.F || data.fat) || 0; const c = Number(data.c || data.C || data.carbs) || 0;
-                if (data.error || isNaN(cals) || cals === 0) { tg.showAlert("ШІ не зміг розпізнати. Спробуйте написати простіше."); return; }
-                currentTempMeal = { name: data.name || data.Name || name, weight: data.weight || data.Weight || weight || 100, cals, p, f, c };
+                if (data.error || isNaN(cals) || cals === 0) { tg.showAlert("ШІ не зміг розпізнати."); return; }
+                currentTempMeal = { name: data.name || name, weight: data.weight || weight || 100, cals, p, f, c };
                 result.style.display = 'block';
-                result.innerHTML = `<div style="font-weight:bold; margin-bottom:10px;">${currentTempMeal.name} (${currentTempMeal.weight}г)</div><div style="font-size:18px; color:var(--primary-color); font-weight:bold; margin-bottom:15px;">${currentTempMeal.cals} ккал</div><div style="display:flex; justify-content:space-between; margin-bottom:15px;"><span style="color:var(--purple-macros);">Б: ${currentTempMeal.p}г</span><span style="color:var(--orange-macros);">Ж: ${currentTempMeal.f}г</span><span style="color:var(--blue-macros);">В: ${currentTempMeal.c}г</span></div><button class="btn btn-primary" style="width:100%; padding:12px;" onclick="confirmAddMeal()">✓ Додати</button>`;
+                result.innerHTML = `<div style="font-weight:bold; margin-bottom:10px;">${currentTempMeal.name} (${currentTempMeal.weight}г)</div><div style="font-size:18px; color:var(--primary-color); font-weight:bold; margin-bottom:15px;">${currentTempMeal.cals} ккал</div><button class="btn btn-primary" style="width:100%; padding:12px;" onclick="confirmAddMeal()">✓ Додати</button>`;
             } catch (e) { tg.showAlert("Не вдалося підключитись до сервера."); } finally { btn.innerText = "Розрахувати КБЖУ"; btn.disabled = false; }
         }
 
@@ -396,11 +382,9 @@
             historyData[dashboardSelectedDate].mealsList.push(currentTempMeal);
             saveHistory(); updateDashboardUI(); if(statSelectedDate === dashboardSelectedDate) updateStatUI(dashboardSelectedDate);
             closeAddMeal();
-            
-            // Очищення полів після додавання
             document.getElementById('food-name-input').value = ""; document.getElementById('food-weight-input').value = "";
-            document.getElementById('image-preview').style.display = 'none'; document.getElementById('calc-photo-btn').style.display = 'none'; currentBase64Image = null;
-            document.getElementById('camera-input').value = ""; document.getElementById('gallery-input').value = "";
+            document.getElementById('image-preview').style.display = 'none'; document.getElementById('calc-photo-btn').style.display = 'none'; 
+            currentBase64Image = null; document.getElementById('camera-input').value = ""; document.getElementById('gallery-input').value = "";
         }
 
         function addWater(amount) { 
@@ -429,8 +413,9 @@
             targetMacros.cals = Math.round(tdee); targetMacros.p=Math.round(targetMacros.cals*0.3/4); targetMacros.f=Math.round(targetMacros.cals*0.3/9); targetMacros.c=Math.round(targetMacros.cals*0.4/4);
             userData.telegram_id = tg.initDataUnsafe?.user?.id || 123456789; userData.macros = targetMacros;
             try { await fetch(`${API_URL}/api/save_user`, {method:"POST", headers:{"Content-Type":"application/json", "ngrok-skip-browser-warning":"true"}, body:JSON.stringify(userData)}); await checkUserOnLoad(); 
-            } catch(e) { tg.showAlert("⚠️ Помилка з'єднання! Перевір посилання Ngrok."); btn.innerText = "Почати!"; btn.disabled = false; }
+            } catch(e) { tg.showAlert("⚠️ Помилка з'єднання!"); btn.innerText = "Почати!"; btn.disabled = false; }
         }
     </script>
 </body>
 </html>
+
