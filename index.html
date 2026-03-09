@@ -132,7 +132,7 @@
                 </div>
 
                 <div id="camera-container" style="display: none; flex-direction: column; align-items: center; margin-bottom: 15px;">
-                    <video id="camera-video" autoplay playsinline style="width: 100%; border-radius: 12px; border: 1px solid var(--border-color); background-color: #000;"></video>
+                    <video id="camera-video" autoplay playsinline muted style="width: 100%; border-radius: 12px; border: 1px solid var(--border-color); background-color: #000;"></video>
                     <div style="display: flex; gap: 10px; width: 100%; margin-top: 10px;">
                         <button class="btn btn-secondary" style="padding: 12px;" onclick="stopCamera()">Скасувати</button>
                         <button class="btn btn-primary" style="padding: 12px;" onclick="takeSnapshot()">📸 Зробити фото</button>
@@ -314,14 +314,15 @@
             const video = document.getElementById('camera-video');
             
             try {
-                // Запрашиваем доступ к задней камере телефона
                 videoStream = await navigator.mediaDevices.getUserMedia({
                     video: { facingMode: "environment" }
                 });
                 video.srcObject = videoStream;
+            
+                video.play(); 
+                
                 container.style.display = 'flex';
                 
-                // Прячем старые превью и кнопку расчета, если они были открыты
                 document.getElementById('image-preview').style.display = 'none';
                 document.getElementById('calc-photo-btn').style.display = 'none';
                 document.getElementById('ai-photo-result-card').style.display = 'none';
@@ -489,6 +490,7 @@
     </script>
 </body>
 </html>
+
 
 
 
