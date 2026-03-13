@@ -72,54 +72,6 @@
         .option-card.selected { border-color: var(--primary-color); background-color: rgba(213, 40, 133, 0.1); }
         .option-icon { font-size: 28px; } .option-text { font-weight: bold; font-size: 16px; } .option-desc { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
 
-        /* ===== CAMERA MODAL ===== */
-        #camera-modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: #000;
-            z-index: 9999;
-            flex-direction: column;
-        }
-        #camera-modal.open { display: flex; }
-        #camera-video {
-            width: 100%;
-            flex: 1;
-            object-fit: cover;
-        }
-        #camera-controls {
-            display: flex;
-            align-items: center;
-            justify-content: space-around;
-            padding: 20px 10px;
-            background: #111;
-        }
-        #camera-shoot-btn {
-            width: 72px;
-            height: 72px;
-            border-radius: 50%;
-            background: white;
-            border: 5px solid #888;
-            cursor: pointer;
-            flex-shrink: 0;
-        }
-        #camera-close-btn {
-            color: white;
-            font-size: 15px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 10px 14px;
-        }
-        #camera-switch-btn {
-            color: white;
-            font-size: 26px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 10px 14px;
-        }
-
         /* photo source buttons */
         .photo-source-row {
             display: flex;
@@ -153,17 +105,6 @@
     </style>
 </head>
 <body>
-
-    <!-- ===== CAMERA MODAL ===== -->
-    <div id="camera-modal">
-        <video id="camera-video" autoplay playsinline muted></video>
-        <canvas id="camera-canvas" style="display:none;"></canvas>
-        <div id="camera-controls">
-            <button id="camera-close-btn" onclick="closeCamera()">✕ Закрити</button>
-            <button id="camera-shoot-btn" onclick="shootPhoto()"></button>
-            <button id="camera-switch-btn" onclick="switchCamera()">🔄</button>
-        </div>
-    </div>
 
     <div id="onboarding" class="onboarding-container" style="display: none;">
         <div id="step1" class="step active"><div class="step-content"><div class="welcome-icon">🍽</div><h2>Ласкаво просимо!</h2><p class="subtitle">FoodApp допоможе вам відстежувати харчування.</p></div><div class="nav-buttons"><button class="btn btn-primary" onclick="nextStep(2)">Далі ></button></div></div>
@@ -211,12 +152,13 @@
         <div class="tabs-container"><button class="tab-btn active" onclick="switchTab('photo', this)">📷 Фото</button><button class="tab-btn" onclick="switchTab('input', this)">✎ Ввід</button></div>
 
         <div id="tab-photo" style="display:block;">
-            <!-- TWO BUTTONS: Camera (getUserMedia) + Gallery (file input) -->
+            <!-- CAMERA = capture="environment", GALLERY = без capture -->
             <div class="photo-source-row">
-                <button class="photo-source-btn" onclick="openCamera()">
+                <label class="photo-source-btn">
                     <span class="icon">📷</span>
                     <span>Камера</span>
-                </button>
+                    <input type="file" accept="image/*" capture="environment" onchange="previewImage(event)">
+                </label>
                 <label class="photo-source-btn">
                     <span class="icon">🖼</span>
                     <span>Галерея</span>
@@ -285,77 +227,10 @@
         let currentBase64Image = null;
 
         // =========================================================
-        // CAMERA via getUserMedia — works on Android inside Telegram
-        // =========================================================
-        let cameraStream = null;
-        let facingMode = 'environment';
-
-        async function openCamera() {
-            const modal = document.getElementById('camera-modal');
-            const video = document.getElementById('camera-video');
-            try {
-                cameraStream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: facingMode, width: { ideal: 1280 }, height: { ideal: 720 } },
-                    audio: false
-                });
-                video.srcObject = cameraStream;
-                modal.classList.add('open');
-            } catch (err) {
-                console.error('Camera error:', err);
-                tg.showAlert('Камера недоступна (' + err.message + '). Оберіть фото з галереї.');
-            }
-        }
-
-        function closeCamera() {
-            if (cameraStream) {
-                cameraStream.getTracks().forEach(t => t.stop());
-                cameraStream = null;
-            }
-            document.getElementById('camera-modal').classList.remove('open');
-            document.getElementById('camera-video').srcObject = null;
-        }
-
-        async function switchCamera() {
-            facingMode = facingMode === 'environment' ? 'user' : 'environment';
-            if (cameraStream) cameraStream.getTracks().forEach(t => t.stop());
-            const video = document.getElementById('camera-video');
-            try {
-                cameraStream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: facingMode }, audio: false
-                });
-                video.srcObject = cameraStream;
-            } catch (err) {
-                console.error('Switch camera error:', err);
-            }
-        }
-
-        function shootPhoto() {
-            const video = document.getElementById('camera-video');
-            const canvas = document.getElementById('camera-canvas');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            canvas.getContext('2d').drawImage(video, 0, 0);
-
-            // Resize to max 800px
-            const maxSize = 800;
-            let w = canvas.width, h = canvas.height;
-            if (w > h) { if (w > maxSize) { h = h * maxSize / w; w = maxSize; } }
-            else { if (h > maxSize) { w = w * maxSize / h; h = maxSize; } }
-            const out = document.createElement('canvas');
-            out.width = w; out.height = h;
-            out.getContext('2d').drawImage(canvas, 0, 0, w, h);
-
-            currentBase64Image = out.toDataURL('image/jpeg', 0.7);
-            const preview = document.getElementById('image-preview');
-            preview.src = currentBase64Image;
-            preview.style.display = 'block';
-            document.getElementById('calc-photo-btn').style.display = 'block';
-            document.getElementById('ai-photo-result-card').style.display = 'none';
-            closeCamera();
-        }
-
-        // =========================================================
-        // GALLERY via file input
+        // GALLERY + CAMERA via file input (works in Telegram Android)
+        // capture="environment" на <input> відкриє камеру напряму
+        // без capture — відкриє галерею
+        // getUserMedia НЕ використовуємо — Telegram блокує mediaDevices
         // =========================================================
         function processImage(file) {
             const reader = new FileReader();
@@ -579,9 +454,13 @@
                 const response = await fetch(`${API_URL}/api/get_ai_tips`, { method: "GET" });
                 if (!response.ok) throw new Error(`Сервер: ${response.status}`);
                 const data = await response.json();
-                container.innerHTML = data.tip_text
-                    ? `<div style="text-align:center; padding:15px 0; font-size:14px; color:white;">${data.tip_text}</div>`
-                    : `<div style="text-align:center; padding:15px 0; color:var(--text-muted);">Не вдалося отримати підказку.</div>`;
+                // Бекенд повертає { tip_text: "...", foods: [...] }
+                const tip = data.tip_text || data.tip || null;
+                if (tip) {
+                    container.innerHTML = `<div style="text-align:center; padding:15px 0; font-size:14px; color:white;">${tip}</div>`;
+                } else {
+                    container.innerHTML = `<div style="text-align:center; padding:15px 0; color:var(--text-muted);">Не вдалося отримати підказку.</div>`;
+                }
             } catch (e) {
                 tg.showAlert("⚠️ Помилка: " + e.message);
             } finally {
