@@ -224,7 +224,8 @@
         async function checkUserOnLoad() {
             const tg_id = tg.initDataUnsafe?.user?.id || 123456789;
             try {
-                const response = await fetch(`${API_URL}/api/get_user?telegram_id=${tg_id}`, { method: "GET", headers: { "ngrok-skip-browser-warning": "true" }});
+                // ПРИБРАНО ngrok-skip-browser-warning
+                const response = await fetch(`${API_URL}/api/get_user?telegram_id=${tg_id}`, { method: "GET" });
                 if (!response.ok) throw new Error("Сервер недоступний");
                 const data = await response.json();
                 if (data.exists) {
@@ -233,7 +234,7 @@
                     showScreen('dashboard');
                 } else { showScreen('onboarding'); }
             } catch (error) { 
-                showScreen('onboarding'); tg.showAlert("⚠️ Немає зв'язку з бекендом. Переконайся, що Ngrok запущено.");
+                showScreen('onboarding'); tg.showAlert("⚠️ Немає зв'язку з бекендом.");
             }
         }
         checkUserOnLoad();
@@ -246,7 +247,7 @@
                     const canvas = document.createElement('canvas');
                     let width = img.width;
                     let height = img.height;
-                    const max_size = 800; // Стискаємо до 800px
+                    const max_size = 800;
 
                     if (width > height) {
                         if (width > max_size) { height *= max_size / width; width = max_size; }
@@ -281,9 +282,10 @@
             const result = document.getElementById('ai-photo-result-card');
             btn.innerText = "⏳ ШІ аналізує фото..."; btn.disabled = true;
             try {
+                // ПРИБРАНО ngrok-skip-browser-warning
                 const response = await fetch(`${API_URL}/api/calculate_photo`, { 
                     method: "POST", 
-                    headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" }, 
+                    headers: { "Content-Type": "application/json" }, 
                     body: JSON.stringify({ image: currentBase64Image }) 
                 });
                 const data = await response.json();
@@ -301,9 +303,9 @@
                     <div style="font-size:18px; color:var(--primary-color); font-weight:bold; margin-bottom:15px;">${currentTempMeal.cals} ккал</div>
                     <button class="btn btn-primary" style="width:100%; padding:12px;" onclick="confirmAddMeal()">✓ Додати</button>
                 `;
-            } catch (e) { tg.showAlert("Помилка сервера. Перевір Ngrok."); } finally { btn.innerText = "Аналізувати фото ✨"; btn.disabled = false; }
+            } catch (e) { tg.showAlert("Помилка сервера."); } finally { btn.innerText = "Аналізувати фото ✨"; btn.disabled = false; }
         }
-// --- ЛОГИКА ВСТРОЕННОЙ КАМЕРЫ (WebRTC) ---
+
         let videoStream = null;
 
         async function startCamera() {
@@ -342,10 +344,9 @@
             const canvas = document.getElementById('camera-canvas');
             const ctx = canvas.getContext('2d');
             
-            // Берем оригинальные размеры видео
             let width = video.videoWidth;
             let height = video.videoHeight;
-            const max_size = 800; // Сжимаем до 800px, как в твоей функции processImage
+            const max_size = 800;
 
             if (width > height) {
                 if (width > max_size) { height *= max_size / width; width = max_size; }
@@ -356,22 +357,18 @@
             canvas.width = width;
             canvas.height = height;
             
-            // Отрисовываем кадр из <video> на <canvas>
             ctx.drawImage(video, 0, 0, width, height);
             
-            // Сохраняем в base64 и передаем в твою переменную
             currentBase64Image = canvas.toDataURL('image/jpeg', 0.7);
             
-            // Выключаем трансляцию
             stopCamera();
             
-            // Показываем превью и кнопку "Аналізувати фото ✨"
             const preview = document.getElementById('image-preview');
             preview.src = currentBase64Image;
             preview.style.display = 'block';
             document.getElementById('calc-photo-btn').style.display = 'block';
         }
-        // --- РЕШТА ФУНКЦІЙ (БЕЗ ЗМІН) ---
+
         function changeDashDate(offset) {
             let d = new Date(dashboardSelectedDate); d.setDate(d.getDate() + offset);
             let newDateStr = d.toISOString().split('T')[0];
@@ -442,8 +439,13 @@
             const btn = document.getElementById('calc-btn'); const result = document.getElementById('ai-result-card');
             btn.innerText = "⏳ ШІ аналізує..."; btn.disabled = true;
             try {
+                // ПРИБРАНО ngrok-skip-browser-warning
                 const query = weight ? `${name} ${weight}г` : name;
-                const response = await fetch(`${API_URL}/api/calculate_food`, { method: "POST", headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" }, body: JSON.stringify({ query }) });
+                const response = await fetch(`${API_URL}/api/calculate_food`, { 
+                    method: "POST", 
+                    headers: { "Content-Type": "application/json" }, 
+                    body: JSON.stringify({ query }) 
+                });
                 const data = await response.json();
                 const cals = Number(data.cals || data.Cals || data.calories) || 0; const p = Number(data.p || data.P || data.protein) || 0; const f = Number(data.f || data.F || data.fat) || 0; const c = Number(data.c || data.C || data.carbs) || 0;
                 if (data.error || isNaN(cals) || cals === 0) { tg.showAlert("ШІ не зміг розпізнати."); return; }
@@ -452,7 +454,8 @@
                 result.innerHTML = `<div style="font-weight:bold; margin-bottom:10px;">${currentTempMeal.name} (${currentTempMeal.weight}г)</div><div style="font-size:18px; color:var(--primary-color); font-weight:bold; margin-bottom:15px;">${currentTempMeal.cals} ккал</div><button class="btn btn-primary" style="width:100%; padding:12px;" onclick="confirmAddMeal()">✓ Додати</button>`;
             } catch (e) { tg.showAlert("Не вдалося підключитись до сервера."); } finally { btn.innerText = "Розрахувати КБЖУ"; btn.disabled = false; }
         }
-async function loadDynamicAITips() {
+
+        async function loadDynamicAITips() {
             const btn = document.getElementById('ai-gen-btn');
             const container = document.getElementById('ai-text-container');
             
@@ -460,10 +463,8 @@ async function loadDynamicAITips() {
             btn.disabled = true;
             
             try {
-                const response = await fetch(`${API_URL}/api/get_ai_tips`, { 
-                    method: "GET", 
-                    headers: { "ngrok-skip-browser-warning": "true" }
-                });
+                // ПРИБРАНО ngrok-skip-browser-warning
+                const response = await fetch(`${API_URL}/api/get_ai_tips`, { method: "GET" });
                 
                 const data = await response.json();
                 if (data.tip_text) {
@@ -478,23 +479,22 @@ async function loadDynamicAITips() {
                 btn.disabled = false;
             }
         }
-    async function editMeal(index) {
+
+        async function editMeal(index) {
             const data = historyData[dashboardSelectedDate];
             const meal = data.mealsList[index];
             
-            // Запитуємо новий текст. Користувач може змінити і вагу, і саму назву
             let newQuery = prompt(`Редагувати запис (введи нову назву та вагу):`, `${meal.name} ${meal.weight}г`);
             if (newQuery === null || newQuery.trim() === "") return;
             
-            // Тимчасово змінюємо заголовок, щоб було видно процес завантаження
             const originalTitle = document.getElementById('dash-date-title').innerText;
             document.getElementById('dash-date-title').innerText = "⏳ ШІ думає...";
             
             try {
-                // Відправляємо змінений текст нашому ШІ на бекенд
+                // ПРИБРАНО ngrok-skip-browser-warning
                 const response = await fetch(`${API_URL}/api/calculate_food`, { 
                     method: "POST", 
-                    headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" }, 
+                    headers: { "Content-Type": "application/json" }, 
                     body: JSON.stringify({ query: newQuery }) 
                 });
                 
@@ -509,18 +509,15 @@ async function loadDynamicAITips() {
                     return; 
                 }
                 
-                // Оновлюємо страву повністю новими даними від ШІ
-                meal.name = aiData.name || meal.name; // Якщо ШІ повернув нове ім'я
+                meal.name = aiData.name || meal.name; 
                 meal.weight = aiData.weight || meal.weight;
                 meal.cals = cals;
                 meal.p = p;
                 meal.f = f;
                 meal.c = c;
                 
-                // Перераховуємо суму калорій за весь день
                 recalculateDayTotals(dashboardSelectedDate);
                 
-                // Зберігаємо і малюємо оновлений інтерфейс
                 saveHistory();
                 updateDashboardUI();
                 if(statSelectedDate === dashboardSelectedDate) updateStatUI(dashboardSelectedDate);
@@ -528,19 +525,15 @@ async function loadDynamicAITips() {
             } catch (e) {
                 tg.showAlert("⚠️ Не вдалося підключитись до сервера при редагуванні.");
             } finally {
-                // Повертаємо заголовок з датою назад
                 document.getElementById('dash-date-title').innerText = originalTitle;
             }
         }
 
-        // Цю функцію ти минулого разу не додав, вона ОБОВ'ЯЗКОВА для правильного перерахунку сум
         function recalculateDayTotals(dateString) {
             const data = historyData[dateString];
             
-            // Обнуляємо поточні підсумки дня
             data.cals = 0; data.p = 0; data.f = 0; data.c = 0;
             
-            // Проходимось по всіх стравах і сумуємо заново
             data.mealsList.forEach(m => {
                 data.cals += m.cals;
                 data.p += m.p;
@@ -548,12 +541,12 @@ async function loadDynamicAITips() {
                 data.c += m.c;
             });
             
-            // Заокруглюємо, щоб не було кривих чисел (наприклад, 10.3333333)
             data.cals = Math.round(data.cals * 10) / 10;
             data.p = Math.round(data.p * 10) / 10;
             data.f = Math.round(data.f * 10) / 10;
             data.c = Math.round(data.c * 10) / 10;
         }
+
         function confirmAddMeal() {
             if(!historyData[dashboardSelectedDate]) { historyData[dashboardSelectedDate] = { cals: 0, p: 0, f: 0, c: 0, water: 0, mealsList: [] }; }
             historyData[dashboardSelectedDate].cals += currentTempMeal.cals; historyData[dashboardSelectedDate].p += currentTempMeal.p; historyData[dashboardSelectedDate].f += currentTempMeal.f; historyData[dashboardSelectedDate].c += currentTempMeal.c;
@@ -562,7 +555,10 @@ async function loadDynamicAITips() {
             closeAddMeal();
             document.getElementById('food-name-input').value = ""; document.getElementById('food-weight-input').value = "";
             document.getElementById('image-preview').style.display = 'none'; document.getElementById('calc-photo-btn').style.display = 'none'; 
-            currentBase64Image = null; document.getElementById('camera-input').value = ""; document.getElementById('gallery-input').value = "";
+            currentBase64Image = null; 
+            
+            // ПРИБРАНО очищення неіснуючого camera-input
+            document.getElementById('gallery-input').value = "";
         }
 
         function addWater(amount) { 
@@ -590,11 +586,19 @@ async function loadDynamicAITips() {
             if(userData.goal==='lose') tdee-=400; if(userData.goal==='gain') tdee+=400;
             targetMacros.cals = Math.round(tdee); targetMacros.p=Math.round(targetMacros.cals*0.3/4); targetMacros.f=Math.round(targetMacros.cals*0.3/9); targetMacros.c=Math.round(targetMacros.cals*0.4/4);
             userData.telegram_id = tg.initDataUnsafe?.user?.id || 123456789; userData.macros = targetMacros;
-            try { await fetch(`${API_URL}/api/save_user`, {method:"POST", headers:{"Content-Type":"application/json", "ngrok-skip-browser-warning":"true"}, body:JSON.stringify(userData)}); await checkUserOnLoad(); 
+            try { 
+                // ПРИБРАНО ngrok-skip-browser-warning
+                await fetch(`${API_URL}/api/save_user`, {
+                    method:"POST", 
+                    headers:{"Content-Type":"application/json"}, 
+                    body:JSON.stringify(userData)
+                }); 
+                await checkUserOnLoad(); 
             } catch(e) { tg.showAlert("⚠️ Помилка з'єднання!"); btn.innerText = "Почати!"; btn.disabled = false; }
         }
     </script>
 </body>
 </html>
+
 
 
