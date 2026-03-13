@@ -78,7 +78,7 @@
         .photo-source-btn input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
         #camera-modal { display: none; position: fixed; inset: 0; background: #000; z-index: 9999; flex-direction: column; }
         #camera-modal.open { display: flex; }
-        #camera-video { width: 100%; flex: 1; object-fit: cover; }
+        #camera-video { width: 100%; flex: 1; object-fit: cover; background: #000; transform: translateZ(0); -webkit-transform: translateZ(0); }
         #camera-controls { display: flex; align-items: center; justify-content: space-around; padding: 20px 10px; background: #111; }
         #camera-shoot-btn { width: 72px; height: 72px; border-radius: 50%; background: white; border: 5px solid #888; cursor: pointer; flex-shrink: 0; }
         #camera-close-btn { color: white; font-size: 15px; background: none; border: none; cursor: pointer; padding: 10px 14px; }
@@ -228,24 +228,44 @@
         let facingMode = 'environment';
 
         async function openCamera() {
-            // Перевіряємо чи доступний getUserMedia
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                // Fallback: відкриваємо file input з capture
                 document.getElementById('camera-file-input').click();
                 return;
             }
             const modal = document.getElementById('camera-modal');
             const video = document.getElementById('camera-video');
             try {
+                // Спочатку показуємо модал — WebView потребує видимого елементу
+                modal.classList.add('open');
+                await new Promise(r => setTimeout(r, 100));
+
                 cameraStream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: facingMode, width: { ideal: 1280 }, height: { ideal: 720 } },
+                    video: { facingMode: facingMode },
                     audio: false
                 });
                 video.srcObject = cameraStream;
-                modal.classList.add('open');
+
+                // Примусово запускаємо відтворення — критично для Telegram WebView
+                video.setAttribute('playsinline', 'true');
+                video.setAttribute('autoplay', 'true');
+                video.muted = true;
+                const playPromise = video.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(e => console.error('Play error:', e));
+                }
+
+                // Якщо через 3 секунди все ще чорний екран — fallback
+                setTimeout(() => {
+                    if (video.videoWidth === 0) {
+                        console.warn('Black screen detected, falling back');
+                        closeCamera();
+                        document.getElementById('camera-file-input').click();
+                    }
+                }, 3000);
+
             } catch (err) {
-                console.error('Camera getUserMedia error:', err.name, err.message);
-                // Fallback на file input
+                console.error('Camera error:', err.name, err.message);
+                modal.classList.remove('open');
                 document.getElementById('camera-file-input').click();
             }
         }
