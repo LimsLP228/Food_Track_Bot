@@ -118,41 +118,16 @@
         <div class="tabs-container"><button class="tab-btn active" onclick="switchTab('photo', this)">📷 Фото</button><button class="tab-btn" onclick="switchTab('input', this)">✎ Ввід</button></div>
         
         <div id="tab-photo" style="display:block;">
-    <div style="display:flex; gap:10px; margin-bottom:15px; text-align:center;">
-        
-        <div class="btn btn-secondary" style="flex:1; padding:20px 10px; border:2px dashed var(--border-color); background-color:var(--bg-color); display:flex; flex-direction:column; align-items:center; position: relative; overflow: hidden; cursor:pointer;">
-            <span style="font-size:30px; margin-bottom:5px;">📸</span>
-            <span style="font-size:13px;">Камера</span>
-            <input type="file" accept="image/*" capture="environment" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10;" onchange="previewImage(event)">
-        </div>
-        
-        <div class="btn btn-secondary" style="flex:1; padding:20px 10px; border:2px dashed var(--border-color); background-color:var(--bg-color); display:flex; flex-direction:column; align-items:center; position: relative; overflow: hidden; cursor:pointer;">
-            <span style="font-size:30px; margin-bottom:5px;">🖼</span>
-            <span style="font-size:13px;">Галерея</span>
-            <input type="file" id="gallery-input" accept="image/*" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10;" onchange="previewImage(event)">
-        </div>
-    </div>
-
-    <img id="image-preview" style="max-width:100%; border-radius:12px; display:none; margin-bottom:15px; border:1px solid var(--border-color);">
-    <button class="btn btn-primary" style="width:100%; display:none;" id="calc-photo-btn" onclick="calculateAIPhoto()">Аналізувати фото ✨</button>
-</div>
-<div id="ai-photo-result-card" style="display:none; margin-top:15px; padding:15px; background-color:var(--card-bg); border-radius:16px;"></div>
-
-                <div id="camera-container" style="display: none; flex-direction: column; align-items: center; margin-bottom: 15px;">
-                    <video id="camera-video" autoplay playsinline muted style="width: 100%; border-radius: 12px; border: 1px solid var(--border-color); background-color: #000;"></video>
-                    <div style="display: flex; gap: 10px; width: 100%; margin-top: 10px;">
-                        <button class="btn btn-secondary" style="padding: 12px;" onclick="stopCamera()">Скасувати</button>
-                        <button class="btn btn-primary" style="padding: 12px;" onclick="takeSnapshot()">📸 Зробити фото</button>
-                    </div>
+            <div style="display:flex; justify-content:center; margin-bottom:15px;">
+                <div class="btn btn-secondary" style="width:100%; padding:30px 10px; border:2px dashed var(--border-color); background-color:var(--bg-color); display:flex; flex-direction:column; align-items:center; position: relative; overflow: hidden; cursor:pointer;">
+                    <span style="font-size:40px; margin-bottom:10px;">📸</span>
+                    <span style="font-size:16px; font-weight:bold;">Зробити фото або обрати</span>
+                    <input type="file" id="photo-input" accept="image/*" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10;" onchange="previewImage(event)">
                 </div>
-                
-                <canvas id="camera-canvas" style="display: none;"></canvas>
-                </div>
-
-                <img id="image-preview" style="max-width:100%; border-radius:12px; display:none; margin-bottom:15px; border:1px solid var(--border-color);">
-                
-                <button class="btn btn-primary" style="width:100%; display:none;" id="calc-photo-btn" onclick="calculateAIPhoto()">Аналізувати фото ✨</button>
             </div>
+
+            <img id="image-preview" style="max-width:100%; border-radius:12px; display:none; margin-bottom:15px; border:1px solid var(--border-color);">
+            <button class="btn btn-primary" style="width:100%; display:none;" id="calc-photo-btn" onclick="calculateAIPhoto()">Аналізувати фото ✨</button>
             <div id="ai-photo-result-card" style="display:none; margin-top:15px; padding:15px; background-color:var(--card-bg); border-radius:16px;"></div>
         </div>
 
@@ -194,7 +169,8 @@
         <div class="nav-item active" onclick="switchMainView('dashboard', this)"><div class="nav-icon">🏠</div>Головна</div>
         <div class="nav-item" onclick="switchMainView('statistics-view', this)"><div class="nav-icon">📊</div>Статистика</div>
     </nav>
-<script>
+
+    <script>
         const tg = window.Telegram.WebApp;
         tg.expand(); tg.ready();
 
@@ -231,7 +207,6 @@
         async function checkUserOnLoad() {
             const tg_id = tg.initDataUnsafe?.user?.id || 123456789;
             try {
-                // ПРИБРАНО ngrok-skip-browser-warning
                 const response = await fetch(`${API_URL}/api/get_user?telegram_id=${tg_id}`, { method: "GET" });
                 if (!response.ok) throw new Error("Сервер недоступний");
                 const data = await response.json();
@@ -289,7 +264,6 @@
             const result = document.getElementById('ai-photo-result-card');
             btn.innerText = "⏳ ШІ аналізує фото..."; btn.disabled = true;
             try {
-                // ПРИБРАНО ngrok-skip-browser-warning
                 const response = await fetch(`${API_URL}/api/calculate_photo`, { 
                     method: "POST", 
                     headers: { "Content-Type": "application/json" }, 
@@ -310,70 +284,7 @@
                     <div style="font-size:18px; color:var(--primary-color); font-weight:bold; margin-bottom:15px;">${currentTempMeal.cals} ккал</div>
                     <button class="btn btn-primary" style="width:100%; padding:12px;" onclick="confirmAddMeal()">✓ Додати</button>
                 `;
-            } catch (e) { tg.showAlert("Помилка сервера."); } finally { btn.innerText = "Аналізувати фото ✨"; btn.disabled = false; }
-        }
-
-        let videoStream = null;
-
-        async function startCamera() {
-            const container = document.getElementById('camera-container');
-            const video = document.getElementById('camera-video');
-            
-            try {
-                videoStream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: "environment" }
-                });
-                video.srcObject = videoStream;
-            
-                video.play(); 
-                
-                container.style.display = 'flex';
-                
-                document.getElementById('image-preview').style.display = 'none';
-                document.getElementById('calc-photo-btn').style.display = 'none';
-                document.getElementById('ai-photo-result-card').style.display = 'none';
-            } catch (err) {
-                console.error("Ошибка камеры: ", err);
-                tg.showAlert("Не вдалося отримати доступ до камери. Перевірте дозволи Telegram у налаштуваннях телефону.");
-            }
-        }
-
-        function stopCamera() {
-            if (videoStream) {
-                videoStream.getTracks().forEach(track => track.stop());
-                videoStream = null;
-            }
-            document.getElementById('camera-container').style.display = 'none';
-        }
-
-        function takeSnapshot() {
-            const video = document.getElementById('camera-video');
-            const canvas = document.getElementById('camera-canvas');
-            const ctx = canvas.getContext('2d');
-            
-            let width = video.videoWidth;
-            let height = video.videoHeight;
-            const max_size = 800;
-
-            if (width > height) {
-                if (width > max_size) { height *= max_size / width; width = max_size; }
-            } else {
-                if (height > max_size) { width *= max_size / height; height = max_size; }
-            }
-            
-            canvas.width = width;
-            canvas.height = height;
-            
-            ctx.drawImage(video, 0, 0, width, height);
-            
-            currentBase64Image = canvas.toDataURL('image/jpeg', 0.7);
-            
-            stopCamera();
-            
-            const preview = document.getElementById('image-preview');
-            preview.src = currentBase64Image;
-            preview.style.display = 'block';
-            document.getElementById('calc-photo-btn').style.display = 'block';
+            } catch (e) { tg.showAlert("Помилка сервера. Спробуйте ще раз."); } finally { btn.innerText = "Аналізувати фото ✨"; btn.disabled = false; }
         }
 
         function changeDashDate(offset) {
@@ -446,7 +357,6 @@
             const btn = document.getElementById('calc-btn'); const result = document.getElementById('ai-result-card');
             btn.innerText = "⏳ ШІ аналізує..."; btn.disabled = true;
             try {
-                // ПРИБРАНО ngrok-skip-browser-warning
                 const query = weight ? `${name} ${weight}г` : name;
                 const response = await fetch(`${API_URL}/api/calculate_food`, { 
                     method: "POST", 
@@ -470,7 +380,6 @@
             btn.disabled = true;
             
             try {
-                // ПРИБРАНО ngrok-skip-browser-warning
                 const response = await fetch(`${API_URL}/api/get_ai_tips`, { method: "GET" });
                 
                 const data = await response.json();
@@ -498,7 +407,6 @@
             document.getElementById('dash-date-title').innerText = "⏳ ШІ думає...";
             
             try {
-                // ПРИБРАНО ngrok-skip-browser-warning
                 const response = await fetch(`${API_URL}/api/calculate_food`, { 
                     method: "POST", 
                     headers: { "Content-Type": "application/json" }, 
@@ -564,8 +472,7 @@
             document.getElementById('image-preview').style.display = 'none'; document.getElementById('calc-photo-btn').style.display = 'none'; 
             currentBase64Image = null; 
             
-            // ПРИБРАНО очищення неіснуючого camera-input
-            document.getElementById('gallery-input').value = "";
+            document.getElementById('photo-input').value = "";
         }
 
         function addWater(amount) { 
@@ -594,7 +501,6 @@
             targetMacros.cals = Math.round(tdee); targetMacros.p=Math.round(targetMacros.cals*0.3/4); targetMacros.f=Math.round(targetMacros.cals*0.3/9); targetMacros.c=Math.round(targetMacros.cals*0.4/4);
             userData.telegram_id = tg.initDataUnsafe?.user?.id || 123456789; userData.macros = targetMacros;
             try { 
-                // ПРИБРАНО ngrok-skip-browser-warning
                 await fetch(`${API_URL}/api/save_user`, {
                     method:"POST", 
                     headers:{"Content-Type":"application/json"}, 
@@ -606,7 +512,3 @@
     </script>
 </body>
 </html>
-
-
-
-
