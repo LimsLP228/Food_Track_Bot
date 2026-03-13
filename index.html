@@ -20,7 +20,7 @@
         .btn { padding: 16px; border-radius: 12px; font-size: 16px; font-weight: bold; border: none; cursor: pointer; text-align: center; transition: 0.1s; }
         .btn-primary { background-color: var(--primary-color); color: white; flex: 2; } .btn-secondary { background-color: var(--card-bg); color: white; border: 1px solid var(--border-color); flex: 1; }
         .welcome-icon { font-size: 60px; text-align: center; margin-bottom: 10px; }
-        
+
         .main-view { display: none; flex-direction: column; padding: 15px; padding-bottom: 100px; max-width: 500px; margin: 0 auto; box-sizing: border-box; }
         .header-date { display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 18px; margin-bottom: 20px; padding: 0 10px; }
         .arrow { color: var(--text-muted); cursor: pointer; font-size: 20px; padding: 0 15px; user-select: none; }
@@ -33,42 +33,137 @@
         .bar-labels { display: flex; justify-content: space-between; font-size: 13px; color: var(--text-muted); margin-bottom: 4px; }
         .bar-bg { width: 100%; height: 6px; background-color: var(--border-color); border-radius: 3px; overflow: hidden; }
         .bar-fill { height: 100%; border-radius: 3px; width: 0%; transition: width 0.3s ease; }
-        
+
         .water-header { display: flex; align-items: center; gap: 8px; color: var(--water-fill); font-weight: bold; margin-bottom: 10px; }
         .water-progress-bg { width: 100%; height: 4px; background-color: var(--water-bg); border-radius: 2px; margin-bottom: 15px; overflow: hidden; }
         .water-progress-fill { height: 100%; background-color: var(--water-fill); width: 0%; transition: width 0.3s ease; }
         .water-btn { background-color: var(--bg-color); border: 1px solid var(--border-color); color: white; border-radius: 20px; padding: 8px 0; flex: 1; text-align: center; font-size: 12px; cursor: pointer; }
-        
+
         .ai-header { display: flex; align-items: center; justify-content: space-between; font-weight: bold; font-size: 16px; color: #c084fc; cursor: pointer; }
         .food-card { background-color: var(--bg-color); border-radius: 12px; padding: 15px; margin-bottom: 10px; }
         .food-header { display: flex; justify-content: space-between; margin-bottom: 5px; } .food-title { font-weight: bold; font-size: 15px; } .food-weight { color: var(--text-muted); font-size: 13px; }
-        .food-macros { font-size: 12px; margin-bottom: 8px; color: white;} .food-desc { font-size: 12px; color: var(--text-muted); }
+        .food-macros { font-size: 12px; margin-bottom: 8px; color: white;}
         .meals-header { display: flex; justify-content: space-between; align-items: center; margin: 20px 0 15px 0; }
         .btn-add-meal { background-color: var(--primary-color); color: white; border: none; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: bold; cursor: pointer; }
-        
+
         .back-btn { background: none; border: none; color: white; font-size: 20px; cursor: pointer; padding: 0; }
-        .tabs-container { display: flex; gap: 10px; margin-bottom: 20px; } .tab-btn { background-color: var(--bg-color); color: var(--text-muted); border: none; padding: 10px; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; flex: 1; } .tab-btn.active { background-color: var(--card-bg); color: white; border: 1px solid var(--border-color); }
-        
+        .tabs-container { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab-btn { background-color: var(--bg-color); color: var(--text-muted); border: none; padding: 10px; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; flex: 1; }
+        .tab-btn.active { background-color: var(--card-bg); color: white; border: 1px solid var(--border-color); }
+
         #statistics-view .header-date { justify-content: center; gap: 20px; }
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center; margin-bottom: 20px; }
         .cal-day-label { font-size: 12px; color: var(--text-muted); margin-bottom: 5px; }
         .cal-date { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 14px; cursor: pointer; position: relative; }
         .cal-date.active { background-color: var(--primary-color); font-weight: bold; }
         .cal-date.has-data::after { content: ''; position: absolute; bottom: 4px; width: 4px; height: 4px; background-color: rgba(255,255,255,0.8); border-radius: 50%; }
-        
+
         .stat-row { display: flex; flex-direction: column; gap: 5px; margin-bottom: 15px; }
         .stat-label-row { display: flex; justify-content: space-between; align-items: baseline; }
         .stat-title { font-size: 15px; font-weight: bold; } .stat-value { font-size: 13px; } .stat-percent { font-weight: bold; font-size: 18px; margin-right: 5px; }
         .stat-bar-bg { width: 100%; height: 12px; background-color: var(--border-color); border-radius: 6px; overflow: hidden; }
         .stat-bar-fill { height: 100%; border-radius: 6px; width: 0%; transition: width 0.5s ease; }
-        
+
         .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background-color: var(--card-bg); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; padding: 10px 0 25px 0; z-index: 100; }
         .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); font-size: 11px; cursor: pointer; width: 50%; } .nav-item.active { color: var(--primary-color); }
-        
-        .option-list { display: flex; flex-direction: column; gap: 10px; } .option-card { background-color: var(--bg-color); border: 2px solid transparent; border-radius: 12px; padding: 15px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 15px; } .option-card.selected { border-color: var(--primary-color); background-color: rgba(213, 40, 133, 0.1); } .option-icon { font-size: 28px; } .option-text { font-weight: bold; font-size: 16px; } .option-desc { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+        .option-list { display: flex; flex-direction: column; gap: 10px; }
+        .option-card { background-color: var(--bg-color); border: 2px solid transparent; border-radius: 12px; padding: 15px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 15px; }
+        .option-card.selected { border-color: var(--primary-color); background-color: rgba(213, 40, 133, 0.1); }
+        .option-icon { font-size: 28px; } .option-text { font-weight: bold; font-size: 16px; } .option-desc { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+        /* ===== CAMERA MODAL ===== */
+        #camera-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 9999;
+            flex-direction: column;
+        }
+        #camera-modal.open { display: flex; }
+        #camera-video {
+            width: 100%;
+            flex: 1;
+            object-fit: cover;
+        }
+        #camera-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 20px 10px;
+            background: #111;
+        }
+        #camera-shoot-btn {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: white;
+            border: 5px solid #888;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        #camera-close-btn {
+            color: white;
+            font-size: 15px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 10px 14px;
+        }
+        #camera-switch-btn {
+            color: white;
+            font-size: 26px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 10px 14px;
+        }
+
+        /* photo source buttons */
+        .photo-source-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        .photo-source-btn {
+            flex: 1;
+            background: var(--bg-color);
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 22px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            color: white;
+            font-size: 13px;
+            position: relative;
+        }
+        .photo-source-btn .icon { font-size: 32px; }
+        .photo-source-btn input[type=file] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
     </style>
 </head>
 <body>
+
+    <!-- ===== CAMERA MODAL ===== -->
+    <div id="camera-modal">
+        <video id="camera-video" autoplay playsinline muted></video>
+        <canvas id="camera-canvas" style="display:none;"></canvas>
+        <div id="camera-controls">
+            <button id="camera-close-btn" onclick="closeCamera()">✕ Закрити</button>
+            <button id="camera-shoot-btn" onclick="shootPhoto()"></button>
+            <button id="camera-switch-btn" onclick="switchCamera()">🔄</button>
+        </div>
+    </div>
 
     <div id="onboarding" class="onboarding-container" style="display: none;">
         <div id="step1" class="step active"><div class="step-content"><div class="welcome-icon">🍽</div><h2>Ласкаво просимо!</h2><p class="subtitle">FoodApp допоможе вам відстежувати харчування.</p></div><div class="nav-buttons"><button class="btn btn-primary" onclick="nextStep(2)">Далі ></button></div></div>
@@ -100,7 +195,6 @@
             <div class="water-progress-bg"><div class="water-progress-fill" id="water-bar"></div></div>
             <div style="display:flex; gap:10px;"><div class="water-btn" onclick="addWater(250)">💧 +250 мл</div><div class="water-btn" onclick="addWater(500)">💧 +500 мл</div></div>
         </div>
-
         <div class="dash-card" style="padding-bottom: 5px;">
             <div class="ai-header" onclick="toggleAI()"><span>✨ AI-підказки</span><span id="ai-arrow">^</span></div>
             <div id="ai-content" class="ai-content">
@@ -108,31 +202,27 @@
                 <button class="btn btn-secondary" id="ai-gen-btn" style="width:100%; margin-bottom:10px;" onclick="loadDynamicAITips()">✨ Згенерувати підказку</button>
             </div>
         </div>
-
         <div class="meals-header"><span style="font-size:18px; font-weight:bold;">Прийоми їжі</span><button class="btn-add-meal" onclick="openAddMeal()">+ Додати</button></div>
-        <div id="meals-container"><div style="text-align:center; color:var(--text-muted); padding:30px 0;" id="empty-meals-msg">Поки немає записів</div></div>
+        <div id="meals-container"><div style="text-align:center; color:var(--text-muted); padding:30px 0;">Поки немає записів</div></div>
     </div>
 
-<div style="display:flex; gap:10px; margin-bottom:15px;">
-    <label style="flex:1; background:var(--bg-color); border:2px dashed var(--border-color); 
-        border-radius:12px; padding:25px 10px; display:flex; flex-direction:column; 
-        align-items:center; cursor:pointer; position:relative;">
-        <span style="font-size:32px;">📷</span>
-        <span style="font-size:13px; margin-top:8px; color:var(--text-muted);">Камера</span>
-        <input type="file" accept="image/*" capture="environment" 
-            style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;" 
-            onchange="previewImage(event)">
-    </label>
-    <label style="flex:1; background:var(--bg-color); border:2px dashed var(--border-color); 
-        border-radius:12px; padding:25px 10px; display:flex; flex-direction:column; 
-        align-items:center; cursor:pointer; position:relative;">
-        <span style="font-size:32px;">🖼</span>
-        <span style="font-size:13px; margin-top:8px; color:var(--text-muted);">Галерея</span>
-        <input type="file" accept="image/*" 
-            style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;" 
-            onchange="previewImage(event)">
-    </label>
-</div>
+    <div id="add-meal-view" class="main-view">
+        <div class="view-header" style="display:flex; align-items:center; gap:15px; margin-bottom:20px; font-weight:bold;"><button class="back-btn" onclick="closeAddMeal()">←</button>Додати страву</div>
+        <div class="tabs-container"><button class="tab-btn active" onclick="switchTab('photo', this)">📷 Фото</button><button class="tab-btn" onclick="switchTab('input', this)">✎ Ввід</button></div>
+
+        <div id="tab-photo" style="display:block;">
+            <!-- TWO BUTTONS: Camera (getUserMedia) + Gallery (file input) -->
+            <div class="photo-source-row">
+                <button class="photo-source-btn" onclick="openCamera()">
+                    <span class="icon">📷</span>
+                    <span>Камера</span>
+                </button>
+                <label class="photo-source-btn">
+                    <span class="icon">🖼</span>
+                    <span>Галерея</span>
+                    <input type="file" accept="image/*" onchange="previewImage(event)">
+                </label>
+            </div>
 
             <img id="image-preview" style="max-width:100%; border-radius:12px; display:none; margin-bottom:15px; border:1px solid var(--border-color);">
             <button class="btn btn-primary" style="width:100%; display:none;" id="calc-photo-btn" onclick="calculateAIPhoto()">Аналізувати фото ✨</button>
@@ -185,84 +275,109 @@
         let userData = { gender: null, age: null, height: null, weight: null, goal: null, activity: null };
         let targetMacros = { cals: 0, p: 0, f: 0, c: 0 };
         let currentTempMeal = {};
-        let historyData = {}; 
+        let historyData = {};
         const todayDate = new Date().toISOString().split('T')[0];
-        let statSelectedDate = todayDate; 
+        let statSelectedDate = todayDate;
         let dashboardSelectedDate = todayDate;
 
-        const API_URL = "https://api.foodtrackbot.me"; 
-        
+        const API_URL = "https://api.foodtrackbot.me";
+
         let currentBase64Image = null;
 
-        function loadHistory() {
-            const saved = localStorage.getItem('foodAppHistoryV3');
-            if(saved) historyData = JSON.parse(saved);
-            if(!historyData[todayDate]) { historyData[todayDate] = { cals: 0, p: 0, f: 0, c: 0, water: 0, mealsList: [] }; }
-            if (historyData[todayDate].water === undefined || isNaN(historyData[todayDate].water)) { historyData[todayDate].water = 0; }
-        }
+        // =========================================================
+        // CAMERA via getUserMedia — works on Android inside Telegram
+        // =========================================================
+        let cameraStream = null;
+        let facingMode = 'environment';
 
-        function saveHistory() { localStorage.setItem('foodAppHistoryV3', JSON.stringify(historyData)); }
-        function getDayData(dateString) { return historyData[dateString] || { cals: 0, p: 0, f: 0, c: 0, water: 0, mealsList: [] }; }
-
-        function showScreen(screenId) {
-            document.getElementById('dashboard').style.display = 'none'; document.getElementById('statistics-view').style.display = 'none';
-            document.getElementById('add-meal-view').style.display = 'none'; document.getElementById('onboarding').style.display = 'none';
-            document.getElementById('bottom-nav').style.display = 'none';
-            document.getElementById(screenId).style.display = 'flex';
-            if (screenId === 'dashboard' || screenId === 'statistics-view') { document.getElementById('bottom-nav').style.display = 'flex'; }
-        }
-
-        async function checkUserOnLoad() {
-            const tg_id = tg.initDataUnsafe?.user?.id || 123456789;
+        async function openCamera() {
+            const modal = document.getElementById('camera-modal');
+            const video = document.getElementById('camera-video');
             try {
-                const response = await fetch(`${API_URL}/api/get_user?telegram_id=${tg_id}`, { method: "GET" });
-                if (!response.ok) throw new Error("Сервер недоступний");
-                const data = await response.json();
-                if (data.exists) {
-                    targetMacros = { cals: Number(data.target_calories)||0, p: Number(data.target_p)||0, f: Number(data.target_f)||0, c: Number(data.target_c)||0 };
-                    loadHistory(); updateDashboardUI(); generateCalendar(); updateStatUI(todayDate);
-                    showScreen('dashboard');
-                } else { showScreen('onboarding'); }
-            } catch (error) {
-    console.error("checkUserOnLoad failed:", error);
-    loadHistory();
-    updateDashboardUI();
-    generateCalendar();
-    updateStatUI(todayDate);
-    showScreen('dashboard');
-}
+                cameraStream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: facingMode, width: { ideal: 1280 }, height: { ideal: 720 } },
+                    audio: false
+                });
+                video.srcObject = cameraStream;
+                modal.classList.add('open');
+            } catch (err) {
+                console.error('Camera error:', err);
+                tg.showAlert('Камера недоступна (' + err.message + '). Оберіть фото з галереї.');
+            }
         }
-        checkUserOnLoad();
-    
+
+        function closeCamera() {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(t => t.stop());
+                cameraStream = null;
+            }
+            document.getElementById('camera-modal').classList.remove('open');
+            document.getElementById('camera-video').srcObject = null;
+        }
+
+        async function switchCamera() {
+            facingMode = facingMode === 'environment' ? 'user' : 'environment';
+            if (cameraStream) cameraStream.getTracks().forEach(t => t.stop());
+            const video = document.getElementById('camera-video');
+            try {
+                cameraStream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: facingMode }, audio: false
+                });
+                video.srcObject = cameraStream;
+            } catch (err) {
+                console.error('Switch camera error:', err);
+            }
+        }
+
+        function shootPhoto() {
+            const video = document.getElementById('camera-video');
+            const canvas = document.getElementById('camera-canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+
+            // Resize to max 800px
+            const maxSize = 800;
+            let w = canvas.width, h = canvas.height;
+            if (w > h) { if (w > maxSize) { h = h * maxSize / w; w = maxSize; } }
+            else { if (h > maxSize) { w = w * maxSize / h; h = maxSize; } }
+            const out = document.createElement('canvas');
+            out.width = w; out.height = h;
+            out.getContext('2d').drawImage(canvas, 0, 0, w, h);
+
+            currentBase64Image = out.toDataURL('image/jpeg', 0.7);
+            const preview = document.getElementById('image-preview');
+            preview.src = currentBase64Image;
+            preview.style.display = 'block';
+            document.getElementById('calc-photo-btn').style.display = 'block';
+            document.getElementById('ai-photo-result-card').style.display = 'none';
+            closeCamera();
+        }
+
+        // =========================================================
+        // GALLERY via file input
+        // =========================================================
         function processImage(file) {
             const reader = new FileReader();
             reader.onload = function(e) {
                 const img = new Image();
                 img.onload = function() {
                     const canvas = document.createElement('canvas');
-                    let width = img.width;
-                    let height = img.height;
+                    let width = img.width, height = img.height;
                     const max_size = 800;
-
-                    if (width > height) {
-                        if (width > max_size) { height *= max_size / width; width = max_size; }
-                    } else {
-                        if (height > max_size) { width *= max_size / height; height = max_size; }
-                    }
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-                    
+                    if (width > height) { if (width > max_size) { height *= max_size / width; width = max_size; } }
+                    else { if (height > max_size) { width *= max_size / height; height = max_size; } }
+                    canvas.width = width; canvas.height = height;
+                    canvas.getContext('2d').drawImage(img, 0, 0, width, height);
                     currentBase64Image = canvas.toDataURL('image/jpeg', 0.7);
                     const preview = document.getElementById('image-preview');
                     preview.src = currentBase64Image;
                     preview.style.display = 'block';
                     document.getElementById('calc-photo-btn').style.display = 'block';
                     document.getElementById('ai-photo-result-card').style.display = 'none';
-                }
+                };
                 img.src = e.target.result;
-            }
+            };
             reader.readAsDataURL(file);
         }
 
@@ -271,40 +386,88 @@
             if (file) processImage(file);
         }
 
+        // =========================================================
+        // APP LOGIC
+        // =========================================================
+        function loadHistory() {
+            const saved = localStorage.getItem('foodAppHistoryV3');
+            if (saved) historyData = JSON.parse(saved);
+            if (!historyData[todayDate]) { historyData[todayDate] = { cals: 0, p: 0, f: 0, c: 0, water: 0, mealsList: [] }; }
+            if (historyData[todayDate].water === undefined || isNaN(historyData[todayDate].water)) { historyData[todayDate].water = 0; }
+        }
+
+        function saveHistory() { localStorage.setItem('foodAppHistoryV3', JSON.stringify(historyData)); }
+        function getDayData(dateString) { return historyData[dateString] || { cals: 0, p: 0, f: 0, c: 0, water: 0, mealsList: [] }; }
+
+        function showScreen(screenId) {
+            ['dashboard', 'statistics-view', 'add-meal-view', 'onboarding'].forEach(id => {
+                document.getElementById(id).style.display = 'none';
+            });
+            document.getElementById('bottom-nav').style.display = 'none';
+            document.getElementById(screenId).style.display = 'flex';
+            if (screenId === 'dashboard' || screenId === 'statistics-view') {
+                document.getElementById('bottom-nav').style.display = 'flex';
+            }
+        }
+
+        async function checkUserOnLoad() {
+            const tg_id = tg.initDataUnsafe?.user?.id || 123456789;
+            try {
+                const response = await fetch(`${API_URL}/api/get_user?telegram_id=${tg_id}`, { method: "GET" });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.json();
+                if (data.exists) {
+                    targetMacros = { cals: Number(data.target_calories)||0, p: Number(data.target_p)||0, f: Number(data.target_f)||0, c: Number(data.target_c)||0 };
+                    loadHistory(); updateDashboardUI(); generateCalendar(); updateStatUI(todayDate);
+                    showScreen('dashboard');
+                } else {
+                    showScreen('onboarding');
+                }
+            } catch (error) {
+                console.error("checkUserOnLoad:", error);
+                showScreen('onboarding');
+                tg.showAlert("⚠️ Сервер недоступний: " + error.message);
+            }
+        }
+        checkUserOnLoad();
+
         async function calculateAIPhoto() {
             if (!currentBase64Image) return;
             const btn = document.getElementById('calc-photo-btn');
             const result = document.getElementById('ai-photo-result-card');
             btn.innerText = "⏳ ШІ аналізує фото..."; btn.disabled = true;
             try {
-                const response = await fetch(`${API_URL}/api/calculate_photo`, { 
-                    method: "POST", 
-                    headers: { "Content-Type": "application/json" }, 
-                    body: JSON.stringify({ image: currentBase64Image }) 
+                const response = await fetch(`${API_URL}/api/calculate_photo`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ image: currentBase64Image })
                 });
+                if (!response.ok) throw new Error(`Сервер: ${response.status}`);
                 const data = await response.json();
                 if (data.error === "not_food") { tg.showAlert("ШІ не бачить їжі на фото! 🍕"); return; }
-                
-                currentTempMeal = { 
-                    name: data.name || "Страва з фото", 
-                    weight: data.weight || 100, 
-                    cals: Number(data.cals)||0, p: Number(data.p)||0, f: Number(data.f)||0, c: Number(data.c)||0 
+                currentTempMeal = {
+                    name: data.name || "Страва з фото",
+                    weight: data.weight || 100,
+                    cals: Number(data.cals)||0, p: Number(data.p)||0, f: Number(data.f)||0, c: Number(data.c)||0
                 };
-                
                 result.style.display = 'block';
                 result.innerHTML = `
                     <div style="font-weight:bold; margin-bottom:10px;">✨ ${currentTempMeal.name} (${currentTempMeal.weight}г)</div>
                     <div style="font-size:18px; color:var(--primary-color); font-weight:bold; margin-bottom:15px;">${currentTempMeal.cals} ккал</div>
                     <button class="btn btn-primary" style="width:100%; padding:12px;" onclick="confirmAddMeal()">✓ Додати</button>
                 `;
-            } catch (e) { tg.showAlert("Помилка сервера. Спробуйте ще раз."); } finally { btn.innerText = "Аналізувати фото ✨"; btn.disabled = false; }
+            } catch (e) {
+                tg.showAlert("Помилка: " + e.message);
+            } finally {
+                btn.innerText = "Аналізувати фото ✨"; btn.disabled = false;
+            }
         }
 
         function changeDashDate(offset) {
             let d = new Date(dashboardSelectedDate); d.setDate(d.getDate() + offset);
             let newDateStr = d.toISOString().split('T')[0];
             let todayObj = new Date(todayDate); let diffDays = Math.round((todayObj - d) / 86400000);
-            if (diffDays < 0 || diffDays > 3) return; 
+            if (diffDays < 0 || diffDays > 3) return;
             dashboardSelectedDate = newDateStr; updateDashboardUI();
         }
 
@@ -312,14 +475,21 @@
             let todayObj = new Date(todayDate); let d = new Date(dashboardSelectedDate); let diffDays = Math.round((todayObj - d) / 86400000);
             let title = "Сьогодні"; if (diffDays === 1) title = "Вчора"; else if (diffDays > 1) title = dashboardSelectedDate.split('-').reverse().join('.');
             document.getElementById('dash-date-title').innerText = title;
-            document.getElementById('dash-prev-btn').style.opacity = diffDays >= 3 ? "0.3" : "1"; document.getElementById('dash-next-btn').style.opacity = diffDays <= 0 ? "0.3" : "1";
+            document.getElementById('dash-prev-btn').style.opacity = diffDays >= 3 ? "0.3" : "1";
+            document.getElementById('dash-next-btn').style.opacity = diffDays <= 0 ? "0.3" : "1";
             const data = getDayData(dashboardSelectedDate);
-            document.getElementById('cal-target').innerText = targetMacros.cals; document.getElementById('cal-consumed').innerText = data.cals;
+            document.getElementById('cal-target').innerText = targetMacros.cals;
+            document.getElementById('cal-consumed').innerText = data.cals;
             let calPercent = Math.min((data.cals / (targetMacros.cals || 1)) * 100, 100) || 0;
             document.getElementById('cal-circle').style.background = `conic-gradient(var(--primary-color) ${calPercent}%, var(--border-color) 0)`;
-            document.getElementById('p-text').innerText = `${data.p}/${targetMacros.p} г`; document.getElementById('f-text').innerText = `${data.f}/${targetMacros.f} г`; document.getElementById('c-text').innerText = `${data.c}/${targetMacros.c} г`;
-            document.getElementById('p-bar').style.width = Math.min((data.p / (targetMacros.p || 1)) * 100, 100) + '%'; document.getElementById('f-bar').style.width = Math.min((data.f / (targetMacros.f || 1)) * 100, 100) + '%'; document.getElementById('c-bar').style.width = Math.min((data.c / (targetMacros.c || 1)) * 100, 100) + '%';
-            document.getElementById('current-water').innerText = data.water; document.getElementById('water-bar').style.width = Math.min((data.water / 1500) * 100, 100) + '%';
+            document.getElementById('p-text').innerText = `${data.p}/${targetMacros.p} г`;
+            document.getElementById('f-text').innerText = `${data.f}/${targetMacros.f} г`;
+            document.getElementById('c-text').innerText = `${data.c}/${targetMacros.c} г`;
+            document.getElementById('p-bar').style.width = Math.min((data.p / (targetMacros.p || 1)) * 100, 100) + '%';
+            document.getElementById('f-bar').style.width = Math.min((data.f / (targetMacros.f || 1)) * 100, 100) + '%';
+            document.getElementById('c-bar').style.width = Math.min((data.c / (targetMacros.c || 1)) * 100, 100) + '%';
+            document.getElementById('current-water').innerText = data.water;
+            document.getElementById('water-bar').style.width = Math.min((data.water / 1500) * 100, 100) + '%';
             const container = document.getElementById('meals-container');
             if (data.mealsList.length > 0) {
                 container.innerHTML = '';
@@ -327,7 +497,7 @@
                     const card = document.createElement('div'); card.className = 'food-card';
                     card.innerHTML = `
                         <div class="food-header">
-                            <span class="food-title">${meal.name}</span> 
+                            <span class="food-title">${meal.name}</span>
                             <div>
                                 <span class="food-weight">${meal.weight}г</span>
                                 <span style="cursor:pointer; margin-left:10px; font-size:14px; color:var(--primary-color);" onclick="editMeal(${index})">✏️</span>
@@ -336,125 +506,115 @@
                         <div class="food-macros">${meal.cals} ккал &nbsp; Б:${meal.p}г Ж:${meal.f}г В:${meal.c}г</div>`;
                     container.appendChild(card);
                 });
-            } else { container.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:30px 0;">Поки немає записів</div>'; }
+            } else {
+                container.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:30px 0;">Поки немає записів</div>';
+            }
         }
 
         function updateStatUI(dateString) {
             statSelectedDate = dateString; const data = getDayData(dateString);
-            if(dateString === todayDate) { document.getElementById('stat-date-title').innerText = "Сьогодні"; } else { document.getElementById('stat-date-title').innerText = dateString.split('-').reverse().join('.'); }
-            document.getElementById('stat-p-val').innerText = `${data.p}г / ${targetMacros.p*4} ккал`; document.getElementById('stat-f-val').innerText = `${data.f}г / ${targetMacros.f*9} ккал`; document.getElementById('stat-c-val').innerText = `${data.c}г / ${targetMacros.c*4} ккал`;
-            let pPerc = targetMacros.p ? Math.round((data.p / targetMacros.p) * 100) : 0; let fPerc = targetMacros.f ? Math.round((data.f / targetMacros.f) * 100) : 0; let cPerc = targetMacros.c ? Math.round((data.c / targetMacros.c) * 100) : 0;
-            document.getElementById('stat-p-percent').innerText = `${Math.min(pPerc, 100)}%`; document.getElementById('stat-f-percent').innerText = `${Math.min(fPerc, 100)}%`; document.getElementById('stat-c-percent').innerText = `${Math.min(cPerc, 100)}%`;
-            document.getElementById('stat-p-bar').style.width = `${Math.min(pPerc, 100)}%`; document.getElementById('stat-f-bar').style.width = `${Math.min(fPerc, 100)}%`; document.getElementById('stat-c-bar').style.width = `${Math.min(cPerc, 100)}%`;
-            generateCalendar(); 
+            document.getElementById('stat-date-title').innerText = dateString === todayDate ? "Сьогодні" : dateString.split('-').reverse().join('.');
+            document.getElementById('stat-p-val').innerText = `${data.p}г / ${targetMacros.p*4} ккал`;
+            document.getElementById('stat-f-val').innerText = `${data.f}г / ${targetMacros.f*9} ккал`;
+            document.getElementById('stat-c-val').innerText = `${data.c}г / ${targetMacros.c*4} ккал`;
+            let pPerc = targetMacros.p ? Math.round((data.p / targetMacros.p) * 100) : 0;
+            let fPerc = targetMacros.f ? Math.round((data.f / targetMacros.f) * 100) : 0;
+            let cPerc = targetMacros.c ? Math.round((data.c / targetMacros.c) * 100) : 0;
+            document.getElementById('stat-p-percent').innerText = `${Math.min(pPerc, 100)}%`;
+            document.getElementById('stat-f-percent').innerText = `${Math.min(fPerc, 100)}%`;
+            document.getElementById('stat-c-percent').innerText = `${Math.min(cPerc, 100)}%`;
+            document.getElementById('stat-p-bar').style.width = `${Math.min(pPerc, 100)}%`;
+            document.getElementById('stat-f-bar').style.width = `${Math.min(fPerc, 100)}%`;
+            document.getElementById('stat-c-bar').style.width = `${Math.min(cPerc, 100)}%`;
+            generateCalendar();
         }
 
         function generateCalendar() {
             const calContainer = document.getElementById('stat-calendar'); calContainer.innerHTML = '';
             const daysNames = ['Нд', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
             let labelsHtml = '';
-            for(let i = 6; i >= 0; i--) { let d = new Date(); d.setDate(d.getDate() - i); labelsHtml += `<div class="cal-day-label">${daysNames[d.getDay()]}</div>`; }
+            for (let i = 6; i >= 0; i--) { let d = new Date(); d.setDate(d.getDate() - i); labelsHtml += `<div class="cal-day-label">${daysNames[d.getDay()]}</div>`; }
             calContainer.innerHTML = labelsHtml;
-            for(let i = 6; i >= 0; i--) {
+            for (let i = 6; i >= 0; i--) {
                 let d = new Date(); d.setDate(d.getDate() - i); let dateStr = d.toISOString().split('T')[0];
                 let div = document.createElement('div'); div.className = 'cal-date'; div.innerText = d.getDate();
-                if(dateStr === statSelectedDate) div.classList.add('active');
-                if(historyData[dateStr] && (historyData[dateStr].cals > 0 || historyData[dateStr].water > 0)) { div.classList.add('has-data'); }
-                div.onclick = () => updateStatUI(dateStr); calContainer.appendChild(div);
+                if (dateStr === statSelectedDate) div.classList.add('active');
+                if (historyData[dateStr] && (historyData[dateStr].cals > 0 || historyData[dateStr].water > 0)) div.classList.add('has-data');
+                div.onclick = () => updateStatUI(dateStr);
+                calContainer.appendChild(div);
             }
         }
 
         async function calculateAI() {
-            const name = document.getElementById('food-name-input').value; const weight = document.getElementById('food-weight-input').value;
+            const name = document.getElementById('food-name-input').value;
+            const weight = document.getElementById('food-weight-input').value;
             if (!name) { tg.showAlert("Введіть назву!"); return; }
             const btn = document.getElementById('calc-btn'); const result = document.getElementById('ai-result-card');
             btn.innerText = "⏳ ШІ аналізує..."; btn.disabled = true;
             try {
                 const query = weight ? `${name} ${weight}г` : name;
-                const response = await fetch(`${API_URL}/api/calculate_food`, { 
-                    method: "POST", 
-                    headers: { "Content-Type": "application/json" }, 
-                    body: JSON.stringify({ query }) 
+                const response = await fetch(`${API_URL}/api/calculate_food`, {
+                    method: "POST", headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ query })
                 });
+                if (!response.ok) throw new Error(`Сервер: ${response.status}`);
                 const data = await response.json();
-                const cals = Number(data.cals || data.Cals || data.calories) || 0; const p = Number(data.p || data.P || data.protein) || 0; const f = Number(data.f || data.F || data.fat) || 0; const c = Number(data.c || data.C || data.carbs) || 0;
+                const cals = Number(data.cals || data.Cals || data.calories) || 0;
+                const p = Number(data.p || data.P || data.protein) || 0;
+                const f = Number(data.f || data.F || data.fat) || 0;
+                const c = Number(data.c || data.C || data.carbs) || 0;
                 if (data.error || isNaN(cals) || cals === 0) { tg.showAlert("ШІ не зміг розпізнати."); return; }
                 currentTempMeal = { name: data.name || name, weight: data.weight || weight || 100, cals, p, f, c };
                 result.style.display = 'block';
                 result.innerHTML = `<div style="font-weight:bold; margin-bottom:10px;">${currentTempMeal.name} (${currentTempMeal.weight}г)</div><div style="font-size:18px; color:var(--primary-color); font-weight:bold; margin-bottom:15px;">${currentTempMeal.cals} ккал</div><button class="btn btn-primary" style="width:100%; padding:12px;" onclick="confirmAddMeal()">✓ Додати</button>`;
-            } catch (e) { tg.showAlert("Не вдалося підключитись до сервера."); } finally { btn.innerText = "Розрахувати КБЖУ"; btn.disabled = false; }
+            } catch (e) { tg.showAlert("Помилка: " + e.message); }
+            finally { btn.innerText = "Розрахувати КБЖУ"; btn.disabled = false; }
         }
 
         async function loadDynamicAITips() {
             const btn = document.getElementById('ai-gen-btn');
             const container = document.getElementById('ai-text-container');
-            
-            btn.innerText = "⏳ Генеруємо..."; 
-            btn.disabled = true;
-            
+            btn.innerText = "⏳ Генеруємо..."; btn.disabled = true;
             try {
                 const response = await fetch(`${API_URL}/api/get_ai_tips`, { method: "GET" });
-                
+                if (!response.ok) throw new Error(`Сервер: ${response.status}`);
                 const data = await response.json();
-                if (data.tip_text) {
-                    container.innerHTML = `<div style="text-align:center; padding:15px 0; font-size:14px; color: white;">${data.tip_text}</div>`;
-                } else {
-                    container.innerHTML = `<div style="text-align:center; padding:15px 0; color:var(--text-muted);">Не вдалося отримати підказку.</div>`;
-                }
-                } catch (error) {
-    tg.showAlert("Деталі: " + error.message);
-}
+                container.innerHTML = data.tip_text
+                    ? `<div style="text-align:center; padding:15px 0; font-size:14px; color:white;">${data.tip_text}</div>`
+                    : `<div style="text-align:center; padding:15px 0; color:var(--text-muted);">Не вдалося отримати підказку.</div>`;
             } catch (e) {
-                tg.showAlert("⚠️ Помилка з'єднання з сервером.");
+                tg.showAlert("⚠️ Помилка: " + e.message);
             } finally {
-                btn.innerText = "✨ Згенерувати підказку"; 
-                btn.disabled = false;
+                btn.innerText = "✨ Згенерувати підказку"; btn.disabled = false;
             }
         }
 
         async function editMeal(index) {
             const data = historyData[dashboardSelectedDate];
             const meal = data.mealsList[index];
-            
-            let newQuery = prompt(`Редагувати запис (введи нову назву та вагу):`, `${meal.name} ${meal.weight}г`);
+            let newQuery = prompt(`Редагувати запис:`, `${meal.name} ${meal.weight}г`);
             if (newQuery === null || newQuery.trim() === "") return;
-            
             const originalTitle = document.getElementById('dash-date-title').innerText;
             document.getElementById('dash-date-title').innerText = "⏳ ШІ думає...";
-            
             try {
-                const response = await fetch(`${API_URL}/api/calculate_food`, { 
-                    method: "POST", 
-                    headers: { "Content-Type": "application/json" }, 
-                    body: JSON.stringify({ query: newQuery }) 
+                const response = await fetch(`${API_URL}/api/calculate_food`, {
+                    method: "POST", headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ query: newQuery })
                 });
-                
+                if (!response.ok) throw new Error(`Сервер: ${response.status}`);
                 const aiData = await response.json();
-                const cals = Number(aiData.cals || aiData.Cals || aiData.calories) || 0; 
-                const p = Number(aiData.p || aiData.P || aiData.protein) || 0; 
-                const f = Number(aiData.f || aiData.F || aiData.fat) || 0; 
+                const cals = Number(aiData.cals || aiData.Cals || aiData.calories) || 0;
+                const p = Number(aiData.p || aiData.P || aiData.protein) || 0;
+                const f = Number(aiData.f || aiData.F || aiData.fat) || 0;
                 const c = Number(aiData.c || aiData.C || aiData.carbs) || 0;
-                
-                if (aiData.error || isNaN(cals) || cals === 0) { 
-                    tg.showAlert("ШІ не зміг розпізнати нові дані 😕 Спробуй написати зрозуміліше."); 
-                    return; 
-                }
-                
-                meal.name = aiData.name || meal.name; 
-                meal.weight = aiData.weight || meal.weight;
-                meal.cals = cals;
-                meal.p = p;
-                meal.f = f;
-                meal.c = c;
-                
+                if (aiData.error || isNaN(cals) || cals === 0) { tg.showAlert("ШІ не зміг розпізнати 😕"); return; }
+                meal.name = aiData.name || meal.name; meal.weight = aiData.weight || meal.weight;
+                meal.cals = cals; meal.p = p; meal.f = f; meal.c = c;
                 recalculateDayTotals(dashboardSelectedDate);
-                
-                saveHistory();
-                updateDashboardUI();
-                if(statSelectedDate === dashboardSelectedDate) updateStatUI(dashboardSelectedDate);
-                
+                saveHistory(); updateDashboardUI();
+                if (statSelectedDate === dashboardSelectedDate) updateStatUI(dashboardSelectedDate);
             } catch (e) {
-                tg.showAlert("⚠️ Не вдалося підключитись до сервера при редагуванні.");
+                tg.showAlert("⚠️ Помилка: " + e.message);
             } finally {
                 document.getElementById('dash-date-title').innerText = originalTitle;
             }
@@ -462,70 +622,88 @@
 
         function recalculateDayTotals(dateString) {
             const data = historyData[dateString];
-            
             data.cals = 0; data.p = 0; data.f = 0; data.c = 0;
-            
-            data.mealsList.forEach(m => {
-                data.cals += m.cals;
-                data.p += m.p;
-                data.f += m.f;
-                data.c += m.c;
-            });
-            
-            data.cals = Math.round(data.cals * 10) / 10;
-            data.p = Math.round(data.p * 10) / 10;
-            data.f = Math.round(data.f * 10) / 10;
-            data.c = Math.round(data.c * 10) / 10;
+            data.mealsList.forEach(m => { data.cals += m.cals; data.p += m.p; data.f += m.f; data.c += m.c; });
+            data.cals = Math.round(data.cals * 10) / 10; data.p = Math.round(data.p * 10) / 10;
+            data.f = Math.round(data.f * 10) / 10; data.c = Math.round(data.c * 10) / 10;
         }
 
         function confirmAddMeal() {
-            if(!historyData[dashboardSelectedDate]) { historyData[dashboardSelectedDate] = { cals: 0, p: 0, f: 0, c: 0, water: 0, mealsList: [] }; }
-            historyData[dashboardSelectedDate].cals += currentTempMeal.cals; historyData[dashboardSelectedDate].p += currentTempMeal.p; historyData[dashboardSelectedDate].f += currentTempMeal.f; historyData[dashboardSelectedDate].c += currentTempMeal.c;
+            if (!historyData[dashboardSelectedDate]) { historyData[dashboardSelectedDate] = { cals: 0, p: 0, f: 0, c: 0, water: 0, mealsList: [] }; }
+            historyData[dashboardSelectedDate].cals += currentTempMeal.cals;
+            historyData[dashboardSelectedDate].p += currentTempMeal.p;
+            historyData[dashboardSelectedDate].f += currentTempMeal.f;
+            historyData[dashboardSelectedDate].c += currentTempMeal.c;
             historyData[dashboardSelectedDate].mealsList.push(currentTempMeal);
-            saveHistory(); updateDashboardUI(); if(statSelectedDate === dashboardSelectedDate) updateStatUI(dashboardSelectedDate);
+            saveHistory(); updateDashboardUI();
+            if (statSelectedDate === dashboardSelectedDate) updateStatUI(dashboardSelectedDate);
             closeAddMeal();
-            document.getElementById('food-name-input').value = ""; document.getElementById('food-weight-input').value = "";
-            document.getElementById('image-preview').style.display = 'none'; document.getElementById('calc-photo-btn').style.display = 'none'; 
-            currentBase64Image = null; 
-            
-            document.getElementById('photo-input').value = "";
+            document.getElementById('food-name-input').value = "";
+            document.getElementById('food-weight-input').value = "";
+            document.getElementById('image-preview').style.display = 'none';
+            document.getElementById('calc-photo-btn').style.display = 'none';
+            currentBase64Image = null;
         }
 
-        function addWater(amount) { 
-            if(!historyData[dashboardSelectedDate]) { historyData[dashboardSelectedDate] = { cals: 0, p: 0, f: 0, c: 0, water: 0, mealsList: [] }; }
-            historyData[dashboardSelectedDate].water += amount; saveHistory(); updateDashboardUI(); if(statSelectedDate === dashboardSelectedDate) updateStatUI(dashboardSelectedDate);
+        function addWater(amount) {
+            if (!historyData[dashboardSelectedDate]) { historyData[dashboardSelectedDate] = { cals: 0, p: 0, f: 0, c: 0, water: 0, mealsList: [] }; }
+            historyData[dashboardSelectedDate].water += amount;
+            saveHistory(); updateDashboardUI();
+            if (statSelectedDate === dashboardSelectedDate) updateStatUI(dashboardSelectedDate);
         }
 
-        function switchMainView(viewId, navItem) { 
-            showScreen(viewId); document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active')); navItem.classList.add('active'); window.scrollTo(0,0); 
-            if(viewId === 'statistics-view') updateStatUI(todayDate); if(viewId === 'dashboard') { dashboardSelectedDate = todayDate; updateDashboardUI(); }
+        function switchMainView(viewId, navItem) {
+            showScreen(viewId);
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            navItem.classList.add('active');
+            window.scrollTo(0, 0);
+            if (viewId === 'statistics-view') updateStatUI(todayDate);
+            if (viewId === 'dashboard') { dashboardSelectedDate = todayDate; updateDashboardUI(); }
         }
 
-        function toggleAI() { const c = document.getElementById('ai-content'); const a = document.getElementById('ai-arrow'); if(c.style.display==='none'){c.style.display='block'; a.innerText='^';}else{c.style.display='none'; a.innerText='v';} }
+        function toggleAI() {
+            const c = document.getElementById('ai-content'); const a = document.getElementById('ai-arrow');
+            if (c.style.display === 'none') { c.style.display = 'block'; a.innerText = '^'; }
+            else { c.style.display = 'none'; a.innerText = 'v'; }
+        }
         function openAddMeal() { showScreen('add-meal-view'); }
-        function closeAddMeal() { showScreen('dashboard'); document.getElementById('ai-result-card').style.display='none'; document.getElementById('ai-photo-result-card').style.display='none'; }
-        function switchTab(t,b){ document.getElementById('tab-photo').style.display=t==='photo'?'block':'none'; document.getElementById('tab-input').style.display=t==='input'?'block':'none'; document.querySelectorAll('.tab-btn').forEach(e=>e.classList.remove('active')); b.classList.add('active'); }
-        function nextStep(s){ document.querySelectorAll('.step').forEach(e=>e.classList.remove('active')); document.getElementById('step'+s).classList.add('active'); }
-        function selectOption(c,v,e){ userData[c]=v; e.parentElement.querySelectorAll('.option-card').forEach(x=>x.classList.remove('selected')); e.classList.add('selected'); }
+        function closeAddMeal() {
+            showScreen('dashboard');
+            document.getElementById('ai-result-card').style.display = 'none';
+            document.getElementById('ai-photo-result-card').style.display = 'none';
+        }
+        function switchTab(t, b) {
+            document.getElementById('tab-photo').style.display = t === 'photo' ? 'block' : 'none';
+            document.getElementById('tab-input').style.display = t === 'input' ? 'block' : 'none';
+            document.querySelectorAll('.tab-btn').forEach(e => e.classList.remove('active'));
+            b.classList.add('active');
+        }
+        function nextStep(s) { document.querySelectorAll('.step').forEach(e => e.classList.remove('active')); document.getElementById('step' + s).classList.add('active'); }
+        function selectOption(c, v, e) { userData[c] = v; e.parentElement.querySelectorAll('.option-card').forEach(x => x.classList.remove('selected')); e.classList.add('selected'); }
 
         async function finishOnboarding() {
-            userData.age = parseInt(document.getElementById('age').value); userData.height = parseInt(document.getElementById('height').value); userData.weight = parseInt(document.getElementById('weight').value);
-            if(!userData.gender || !userData.age || !userData.height || !userData.weight || !userData.goal || !userData.activity){ tg.showAlert("Заповніть поля!"); return; }
+            userData.age = parseInt(document.getElementById('age').value);
+            userData.height = parseInt(document.getElementById('height').value);
+            userData.weight = parseInt(document.getElementById('weight').value);
+            if (!userData.gender || !userData.age || !userData.height || !userData.weight || !userData.goal || !userData.activity) { tg.showAlert("Заповніть поля!"); return; }
             const btn = document.getElementById('finish-btn'); btn.innerText = "⏳ Зберігаємо..."; btn.disabled = true;
-            let bmr = (10*userData.weight)+(6.25*userData.height)-(5*userData.age)+(userData.gender==='male'?5:-161); let tdee = bmr * (userData.activity==='low'?1.2: (userData.activity==='medium'?1.55:1.725));
-            if(userData.goal==='lose') tdee-=400; if(userData.goal==='gain') tdee+=400;
-            targetMacros.cals = Math.round(tdee); targetMacros.p=Math.round(targetMacros.cals*0.3/4); targetMacros.f=Math.round(targetMacros.cals*0.3/9); targetMacros.c=Math.round(targetMacros.cals*0.4/4);
-            userData.telegram_id = tg.initDataUnsafe?.user?.id || 123456789; userData.macros = targetMacros;
-            try { 
-                await fetch(`${API_URL}/api/save_user`, {
-                    method:"POST", 
-                    headers:{"Content-Type":"application/json"}, 
-                    body:JSON.stringify(userData)
-                }); 
-                await checkUserOnLoad(); 
-            } catch(e) { tg.showAlert("⚠️ Помилка з'єднання!"); btn.innerText = "Почати!"; btn.disabled = false; }
+            let bmr = (10 * userData.weight) + (6.25 * userData.height) - (5 * userData.age) + (userData.gender === 'male' ? 5 : -161);
+            let tdee = bmr * (userData.activity === 'low' ? 1.2 : (userData.activity === 'medium' ? 1.55 : 1.725));
+            if (userData.goal === 'lose') tdee -= 400; if (userData.goal === 'gain') tdee += 400;
+            targetMacros.cals = Math.round(tdee);
+            targetMacros.p = Math.round(targetMacros.cals * 0.3 / 4);
+            targetMacros.f = Math.round(targetMacros.cals * 0.3 / 9);
+            targetMacros.c = Math.round(targetMacros.cals * 0.4 / 4);
+            userData.telegram_id = tg.initDataUnsafe?.user?.id || 123456789;
+            userData.macros = targetMacros;
+            try {
+                await fetch(`${API_URL}/api/save_user`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(userData) });
+                await checkUserOnLoad();
+            } catch (e) {
+                tg.showAlert("⚠️ Помилка: " + e.message);
+                btn.innerText = "Почати!"; btn.disabled = false;
+            }
         }
     </script>
 </body>
 </html>
-
