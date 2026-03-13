@@ -199,7 +199,7 @@
         let statSelectedDate = todayDate; 
         let dashboardSelectedDate = todayDate;
 
-        const API_URL = "https://kirby-hypoxanthic-milagro.ngrok-free.dev"; 
+        const API_URL = "https://api.foodtrackbot.me"; 
         
         let currentBase64Image = null;
 
@@ -237,10 +237,7 @@
             }
         }
         checkUserOnLoad();
-
-        // --- ЛОГІКА РОБОТИ З ФОТО (ВИПРАВЛЕНО) ---
-        
-        // Функція для стиснення картинки (ШІ не потрібні великі файли, це пришвидшить роботу)
+    
         function processImage(file) {
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -599,4 +596,5 @@ async function loadDynamicAITips() {
     </script>
 </body>
 </html>
+
 
