@@ -152,19 +152,15 @@
         <div class="tabs-container"><button class="tab-btn active" onclick="switchTab('photo', this)">📷 Фото</button><button class="tab-btn" onclick="switchTab('input', this)">✎ Ввід</button></div>
 
         <div id="tab-photo" style="display:block;">
-            <!-- CAMERA = capture="environment", GALLERY = без capture -->
-            <div class="photo-source-row">
-                <label class="photo-source-btn">
-                    <span class="icon">📷</span>
-                    <span>Камера</span>
-                    <input type="file" accept="image/*" capture="environment" onchange="previewImage(event)">
-                </label>
-                <label class="photo-source-btn">
-                    <span class="icon">🖼</span>
-                    <span>Галерея</span>
-                    <input type="file" accept="image/*" onchange="previewImage(event)">
-                </label>
-            </div>
+            <!-- 
+                Telegram Android ігнорує capture="environment".
+                БЕЗ capture — Android сам показує діалог: Камера / Галерея
+            -->
+            <label class="photo-source-btn" style="width:100%; box-sizing:border-box; justify-content:center; gap:12px; flex-direction:row; padding:20px; margin-bottom:15px;">
+                <span style="font-size:28px;">📷</span>
+                <span style="font-size:16px; font-weight:bold;">Зробити фото або обрати</span>
+                <input type="file" accept="image/*" onchange="previewImage(event)">
+            </label>
 
             <img id="image-preview" style="max-width:100%; border-radius:12px; display:none; margin-bottom:15px; border:1px solid var(--border-color);">
             <button class="btn btn-primary" style="width:100%; display:none;" id="calc-photo-btn" onclick="calculateAIPhoto()">Аналізувати фото ✨</button>
