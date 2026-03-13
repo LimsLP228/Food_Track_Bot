@@ -118,18 +118,25 @@
         <div class="tabs-container"><button class="tab-btn active" onclick="switchTab('photo', this)">📷 Фото</button><button class="tab-btn" onclick="switchTab('input', this)">✎ Ввід</button></div>
         
         <div id="tab-photo" style="display:block;">
-            <div style="display:flex; gap:10px; margin-bottom:15px; text-align:center;">
-                    <div class="btn btn-secondary" onclick="startCamera()" style="flex:1; padding:20px 10px; border:2px dashed var(--border-color); cursor:pointer; background-color:var(--bg-color); display:flex; flex-direction:column; align-items:center;">
-                        <span style="font-size:30px; margin-bottom:5px;">📸</span>
-                        <span style="font-size:13px;">Камера</span>
-                    </div>
-                    
-                    <div class="btn btn-secondary" style="flex:1; padding:20px 10px; border:2px dashed var(--border-color); background-color:var(--bg-color); display:flex; flex-direction:column; align-items:center; position: relative; overflow: hidden; cursor:pointer;">
-                        <span style="font-size:30px; margin-bottom:5px;">🖼</span>
-                        <span style="font-size:13px;">Галерея</span>
-                        <input type="file" id="gallery-input" accept="image/*" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10;" onchange="previewImage(event)">
-                    </div>
-                </div>
+    <div style="display:flex; gap:10px; margin-bottom:15px; text-align:center;">
+        
+        <div class="btn btn-secondary" style="flex:1; padding:20px 10px; border:2px dashed var(--border-color); background-color:var(--bg-color); display:flex; flex-direction:column; align-items:center; position: relative; overflow: hidden; cursor:pointer;">
+            <span style="font-size:30px; margin-bottom:5px;">📸</span>
+            <span style="font-size:13px;">Камера</span>
+            <input type="file" accept="image/*" capture="environment" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10;" onchange="previewImage(event)">
+        </div>
+        
+        <div class="btn btn-secondary" style="flex:1; padding:20px 10px; border:2px dashed var(--border-color); background-color:var(--bg-color); display:flex; flex-direction:column; align-items:center; position: relative; overflow: hidden; cursor:pointer;">
+            <span style="font-size:30px; margin-bottom:5px;">🖼</span>
+            <span style="font-size:13px;">Галерея</span>
+            <input type="file" id="gallery-input" accept="image/*" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 10;" onchange="previewImage(event)">
+        </div>
+    </div>
+
+    <img id="image-preview" style="max-width:100%; border-radius:12px; display:none; margin-bottom:15px; border:1px solid var(--border-color);">
+    <button class="btn btn-primary" style="width:100%; display:none;" id="calc-photo-btn" onclick="calculateAIPhoto()">Аналізувати фото ✨</button>
+</div>
+<div id="ai-photo-result-card" style="display:none; margin-top:15px; padding:15px; background-color:var(--card-bg); border-radius:16px;"></div>
 
                 <div id="camera-container" style="display: none; flex-direction: column; align-items: center; margin-bottom: 15px;">
                     <video id="camera-video" autoplay playsinline muted style="width: 100%; border-radius: 12px; border: 1px solid var(--border-color); background-color: #000;"></video>
@@ -599,6 +606,7 @@
     </script>
 </body>
 </html>
+
 
 
 
