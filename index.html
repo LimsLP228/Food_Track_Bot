@@ -72,39 +72,31 @@
         .option-card.selected { border-color: var(--primary-color); background-color: rgba(213, 40, 133, 0.1); }
         .option-icon { font-size: 28px; } .option-text { font-weight: bold; font-size: 16px; } .option-desc { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
 
-        /* photo source buttons */
-        .photo-source-row {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 15px;
-        }
-        .photo-source-btn {
-            flex: 1;
-            background: var(--bg-color);
-            border: 2px dashed var(--border-color);
-            border-radius: 12px;
-            padding: 22px 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            color: white;
-            font-size: 13px;
-            position: relative;
-        }
+        .photo-source-row { display: flex; gap: 12px; margin-bottom: 15px; }
+        .photo-source-btn { flex: 1; background: var(--bg-color); border: 2px dashed var(--border-color); border-radius: 12px; padding: 22px 10px; display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; color: white; font-size: 13px; position: relative; }
         .photo-source-btn .icon { font-size: 32px; }
-        .photo-source-btn input[type=file] {
-            position: absolute;
-            inset: 0;
-            opacity: 0;
-            cursor: pointer;
-            width: 100%;
-            height: 100%;
-        }
+        .photo-source-btn input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+        #camera-modal { display: none; position: fixed; inset: 0; background: #000; z-index: 9999; flex-direction: column; }
+        #camera-modal.open { display: flex; }
+        #camera-video { width: 100%; flex: 1; object-fit: cover; }
+        #camera-controls { display: flex; align-items: center; justify-content: space-around; padding: 20px 10px; background: #111; }
+        #camera-shoot-btn { width: 72px; height: 72px; border-radius: 50%; background: white; border: 5px solid #888; cursor: pointer; flex-shrink: 0; }
+        #camera-close-btn { color: white; font-size: 15px; background: none; border: none; cursor: pointer; padding: 10px 14px; }
+        #camera-switch-btn { color: white; font-size: 26px; background: none; border: none; cursor: pointer; padding: 10px 14px; }
     </style>
 </head>
 <body>
+
+    <!-- CAMERA MODAL -->
+    <div id="camera-modal">
+        <video id="camera-video" autoplay playsinline muted></video>
+        <canvas id="camera-canvas" style="display:none;"></canvas>
+        <div id="camera-controls">
+            <button id="camera-close-btn" onclick="closeCamera()">✕ Закрити</button>
+            <button id="camera-shoot-btn" onclick="shootPhoto()"></button>
+            <button id="camera-switch-btn" onclick="switchCamera()">🔄</button>
+        </div>
+    </div>
 
     <div id="onboarding" class="onboarding-container" style="display: none;">
         <div id="step1" class="step active"><div class="step-content"><div class="welcome-icon">🍽</div><h2>Ласкаво просимо!</h2><p class="subtitle">FoodApp допоможе вам відстежувати харчування.</p></div><div class="nav-buttons"><button class="btn btn-primary" onclick="nextStep(2)">Далі ></button></div></div>
@@ -152,15 +144,21 @@
         <div class="tabs-container"><button class="tab-btn active" onclick="switchTab('photo', this)">📷 Фото</button><button class="tab-btn" onclick="switchTab('input', this)">✎ Ввід</button></div>
 
         <div id="tab-photo" style="display:block;">
-            <!-- 
-                Telegram Android ігнорує capture="environment".
-                БЕЗ capture — Android сам показує діалог: Камера / Галерея
-            -->
-            <label class="photo-source-btn" style="width:100%; box-sizing:border-box; justify-content:center; gap:12px; flex-direction:row; padding:20px; margin-bottom:15px;">
-                <span style="font-size:28px;">📷</span>
-                <span style="font-size:16px; font-weight:bold;">Зробити фото або обрати</span>
-                <input type="file" accept="image/*" onchange="previewImage(event)">
-            </label>
+            <div class="photo-source-row">
+                <button class="photo-source-btn" onclick="openCamera()" style="position:relative;">
+                    <span class="icon">📷</span>
+                    <span>Камера</span>
+                    <!-- fallback якщо getUserMedia недоступний -->
+                    <input type="file" id="camera-file-input" accept="image/*" capture="environment"
+                        style="position:absolute;inset:0;opacity:0;pointer-events:none;"
+                        onchange="previewImage(event)">
+                </button>
+                <label class="photo-source-btn">
+                    <span class="icon">🖼</span>
+                    <span>Галерея</span>
+                    <input type="file" accept="image/*" onchange="previewImage(event)">
+                </label>
+            </div>
 
             <img id="image-preview" style="max-width:100%; border-radius:12px; display:none; margin-bottom:15px; border:1px solid var(--border-color);">
             <button class="btn btn-primary" style="width:100%; display:none;" id="calc-photo-btn" onclick="calculateAIPhoto()">Аналізувати фото ✨</button>
@@ -223,11 +221,69 @@
         let currentBase64Image = null;
 
         // =========================================================
-        // GALLERY + CAMERA via file input (works in Telegram Android)
-        // capture="environment" на <input> відкриє камеру напряму
-        // без capture — відкриє галерею
-        // getUserMedia НЕ використовуємо — Telegram блокує mediaDevices
+        // CAMERA — getUserMedia (спрацьовує на деяких версіях Telegram Android)
+        // Якщо getUserMedia недоступний — fallback на file input
         // =========================================================
+        let cameraStream = null;
+        let facingMode = 'environment';
+
+        async function openCamera() {
+            // Перевіряємо чи доступний getUserMedia
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                // Fallback: відкриваємо file input з capture
+                document.getElementById('camera-file-input').click();
+                return;
+            }
+            const modal = document.getElementById('camera-modal');
+            const video = document.getElementById('camera-video');
+            try {
+                cameraStream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: facingMode, width: { ideal: 1280 }, height: { ideal: 720 } },
+                    audio: false
+                });
+                video.srcObject = cameraStream;
+                modal.classList.add('open');
+            } catch (err) {
+                console.error('Camera getUserMedia error:', err.name, err.message);
+                // Fallback на file input
+                document.getElementById('camera-file-input').click();
+            }
+        }
+
+        function closeCamera() {
+            if (cameraStream) { cameraStream.getTracks().forEach(t => t.stop()); cameraStream = null; }
+            document.getElementById('camera-modal').classList.remove('open');
+            document.getElementById('camera-video').srcObject = null;
+        }
+
+        async function switchCamera() {
+            facingMode = facingMode === 'environment' ? 'user' : 'environment';
+            if (cameraStream) cameraStream.getTracks().forEach(t => t.stop());
+            try {
+                cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode }, audio: false });
+                document.getElementById('camera-video').srcObject = cameraStream;
+            } catch (err) { console.error('Switch camera error:', err); }
+        }
+
+        function shootPhoto() {
+            const video = document.getElementById('camera-video');
+            const canvas = document.getElementById('camera-canvas');
+            canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            const maxSize = 800;
+            let w = canvas.width, h = canvas.height;
+            if (w > h) { if (w > maxSize) { h = h * maxSize / w; w = maxSize; } }
+            else { if (h > maxSize) { w = w * maxSize / h; h = maxSize; } }
+            const out = document.createElement('canvas');
+            out.width = w; out.height = h;
+            out.getContext('2d').drawImage(canvas, 0, 0, w, h);
+            currentBase64Image = out.toDataURL('image/jpeg', 0.7);
+            const preview = document.getElementById('image-preview');
+            preview.src = currentBase64Image; preview.style.display = 'block';
+            document.getElementById('calc-photo-btn').style.display = 'block';
+            document.getElementById('ai-photo-result-card').style.display = 'none';
+            closeCamera();
+        }
         function processImage(file) {
             const reader = new FileReader();
             reader.onload = function(e) {
